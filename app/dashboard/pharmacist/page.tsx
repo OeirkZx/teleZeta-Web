@@ -40,7 +40,7 @@ export default function PharmacistDashboard() {
         // Let's assume patients choose a pharmacy when they redeem.
         const { data: orders } = await supabase
           .from('prescriptions')
-          .select('*, patient:profiles!patient_id(full_name), doctor:doctors(profiles(full_name))')
+          .select('*, patient:profiles!patient_id(full_name), doctor:doctors(profiles(full_name)), prescription_items(*)')
           .eq('pharmacist_id', user.id)
           .order('updated_at', { ascending: false });
 
@@ -92,11 +92,11 @@ export default function PharmacistDashboard() {
             <p className="text-blue-200 font-medium mb-1 tracking-wide uppercase text-sm">Apotek Mitra TeleZeta</p>
             <h1 className="text-3xl lg:text-4xl font-serif font-bold text-white mb-2">{pharmacistData?.pharmacy_name || 'Apotek Anda'}</h1>
             <p className="text-blue-100 flex items-center gap-2">
-              <Store className="w-4 h-4" /> {pharmacistData?.address || 'Alamat Apotek'} • SIA: {pharmacistData?.license_number || '-'}
+              <Store className="w-4 h-4" /> {pharmacistData?.pharmacy_address || 'Alamat Apotek'} • SIA: {pharmacistData?.sipa_number || '-'}
             </p>
           </div>
           <div className="flex gap-3">
-            <Link href="/dashboard/pharmacist/orders" className="px-6 py-3 rounded-xl font-bold bg-white text-blue-900 hover:bg-gray-50 flex items-center transition-colors shadow-lg">
+            <Link href="/dashboard/pharmacist/queue" className="px-6 py-3 rounded-xl font-bold bg-white text-blue-900 hover:bg-gray-50 flex items-center transition-colors shadow-lg">
               <Package className="w-5 h-5 mr-2" /> Proses Pesanan
             </Link>
           </div>
@@ -139,7 +139,7 @@ export default function PharmacistDashboard() {
       <div className="animate-fadeUp d2">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">Aktivitas Terbaru</h2>
-          <Link href="/dashboard/pharmacist/orders" className="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+          <Link href="/dashboard/pharmacist/queue" className="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
             Lihat Semua <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -155,7 +155,7 @@ export default function PharmacistDashboard() {
             </div>
             <div className="divide-y divide-gray-100">
               {recentOrders.slice(0, 8).map((order) => (
-                <Link key={order.id} href={`/dashboard/pharmacist/orders?id=${order.id}`} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors group">
+                <Link key={order.id} href={`/dashboard/pharmacist/queue?id=${order.id}`} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors group">
                   <div className="col-span-3 md:col-span-2 text-sm">
                     <p className="font-semibold text-gray-900">{formatTime(order.updated_at)}</p>
                     <p className="text-xs text-gray-500">{new Date(order.updated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
@@ -168,7 +168,7 @@ export default function PharmacistDashboard() {
                     {order.doctor?.profiles?.full_name}
                   </div>
                   <div className="hidden md:block md:col-span-2 text-sm font-semibold text-gray-700">
-                    {order.medications.length} Obat
+                    {order.prescription_items?.length || 0} Obat
                   </div>
                   <div className="col-span-4 md:col-span-2 text-right md:text-left">
                     <Badge status={order.status as any} />
