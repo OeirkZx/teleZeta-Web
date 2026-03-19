@@ -1,26 +1,360 @@
 @import "tailwindcss";
 
+/* ============================================================
+   TeleZeta Design System — Global CSS
+   ============================================================ */
+
+/* ---- Design Tokens (CSS Custom Properties) ---- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy-primary: #0B1F3A;
+  --navy-secondary: #112848;
+  --navy-tertiary: #1A3A68;
+  --blue-accent: #4A9FD4;
+  --blue-accent-light: #6AB8E8;
+  --silver-primary: #A8BCD4;
+  --silver-secondary: #C8D6E8;
+  --silver-bright: #E2EAF4;
+  --bg-light: #EEF3F8;
+  --white-card: #FFFFFF;
+  --text-primary: #0D1C2E;
+  --text-secondary: #3A5878;
+  --text-muted: #6A88A4;
+  --border-color: #C8D8E8;
+  --success: #22C55E;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+
+  /* Sidebar width */
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 72px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---- Base Reset & Typography ---- */
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: 'DM Serif Display', serif;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--silver-primary);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ============================================================
+   Animations & Keyframes
+   ============================================================ */
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pageOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.99);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes barGrow {
+  from { width: 0; }
+  to { width: var(--w); }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Animation utility classes ---- */
+.animate-pageIn {
+  animation: pageIn 0.4s cubic-bezier(.22,.68,0,1.2) both;
+}
+.animate-pageOut {
+  animation: pageOut 0.3s ease both;
+}
+.animate-fadeUp {
+  animation: fadeUp 0.45s ease both;
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease both;
+}
+.animate-slideRight {
+  animation: slideRight 0.4s ease both;
+}
+.animate-popIn {
+  animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1) both;
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #e8eef4 25%, #f0f5fa 50%, #e8eef4 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+.animate-pulseRing {
+  animation: pulseRing 1.5s ease-out infinite;
+}
+.animate-float {
+  animation: float 3s ease infinite;
+}
+.animate-toastIn {
+  animation: toastIn 0.4s ease both;
+}
+.animate-slideDown {
+  animation: slideDown 0.3s ease both;
+}
+
+/* Stagger delay classes */
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.10s; }
+.d3 { animation-delay: 0.15s; }
+.d4 { animation-delay: 0.20s; }
+.d5 { animation-delay: 0.25s; }
+.d6 { animation-delay: 0.30s; }
+.d7 { animation-delay: 0.35s; }
+.d8 { animation-delay: 0.40s; }
+
+/* ---- Common UI Patterns ---- */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(200, 216, 232, 0.5);
+  border-radius: 16px;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(11, 31, 58, 0.04);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.card:hover {
+  box-shadow: 0 4px 12px rgba(11, 31, 58, 0.08);
+}
+.card-clickable:hover {
+  box-shadow: 0 8px 24px rgba(11, 31, 58, 0.12);
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ---- Button Ripple Effect ---- */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 60%);
+  transform: scale(0);
+  transition: transform 0.3s;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.btn-ripple:active::after {
+  transform: scale(2.5);
+  transition: transform 0s;
+}
+
+/* ---- Sidebar styles ---- */
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: var(--silver-primary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+}
+.sidebar-nav-item:hover {
+  background: rgba(255,255,255,0.07);
+  color: var(--silver-bright);
+}
+.sidebar-nav-item.active {
+  background: rgba(74,159,212,0.18);
+  color: #FFFFFF;
+  border-left-color: var(--blue-accent);
+}
+
+/* ---- Badge styles ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ---- Skeleton Loading ---- */
+.skeleton {
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e8eef4 25%, #f0f5fa 50%, #e8eef4 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ---- Toast notification ---- */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+  }
 }
