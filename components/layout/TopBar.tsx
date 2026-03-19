@@ -6,8 +6,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Bell, Menu } from 'lucide-react';
 import { useNotifications } from '@/lib/hooks/useNotifications';
 import { formatRelativeTime } from '@/lib/utils/formatters';
-import { MOCK_NOTIFICATIONS } from '@/lib/types';
 import type { Notification } from '@/lib/types';
+import { useAuth } from '@/lib/hooks/useAuth';
+import Avatar from '@/components/common/Avatar';
 
 interface TopBarProps {
   userId: string | null;
@@ -16,12 +17,24 @@ interface TopBarProps {
 
 export default function TopBar({ userId, onMenuClick }: TopBarProps) {
   const { notifications: realNotifications, unreadCount: realUnread, markAsRead, markAllAsRead } = useNotifications(userId);
+  const { profile } = useAuth();
   const [showNotifs, setShowNotifs] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // Use mock data if no real notifications
-  const notifications: Notification[] = realNotifications.length > 0 ? realNotifications : MOCK_NOTIFICATIONS;
-  const unreadCount = realNotifications.length > 0 ? realUnread : MOCK_NOTIFICATIONS.filter(n => !n.is_read).length;
+  const notifications: Notification[] = realNotifications;
+  const unreadCount = realUnread;
+  
+  const [prevUnread, setPrevUnread] = useState(unreadCount);
+  const [wiggle, setWiggle] = useState(false);
+
+  useEffect(() => {
+    if (unreadCount > prevUnread) {
+      setWiggle(true);
+      const timer = setTimeout(() => setWiggle(false), 500);
+      return () => clearTimeout(timer);
+    }
+    setPrevUnread(unreadCount);
+  }, [unreadCount, prevUnread]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -66,7 +79,7 @@ export default function TopBar({ userId, onMenuClick }: TopBarProps) {
           <Bell size={20} />
           {unreadCount > 0 && (
             <span
-              className="absolute -top-0.5 -right-0.5 flex items-center justify-center text-white text-xs font-bold animate-popIn"
+              className={`absolute -top-0.5 -right-0.5 flex items-center justify-center text-white text-xs font-bold animate-bounceIn ${wiggle ? 'animate-wiggle' : ''}`}
               style={{
                 background: 'var(--danger)',
                 width: 18,
@@ -105,9 +118,14 @@ export default function TopBar({ userId, onMenuClick }: TopBarProps) {
             </div>
 
             <div className="overflow-y-auto" style={{ maxHeight: 320 }}>
-              {notifications.slice(0, 5).map((notif) => (
-                <div
-                  key={notif.id}
+              {notifications.length === 0 ? (
+                <div className="px-4 py-8 text-center" style={{ color: 'var(--text-muted)' }}>
+                  <p className="text-sm">Tidak ada notifikasi</p>
+                </div>
+              ) : (
+                notifications.slice(0, 5).map((notif) => (
+                  <div
+                    key={notif.id}
                   onClick={() => {
                     if (!notif.is_read) markAsRead(notif.id);
                     setShowNotifs(false);
@@ -145,10 +163,16 @@ export default function TopBar({ userId, onMenuClick }: TopBarProps) {
                     />
                   )}
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         )}
+      </div>
+
+      {/* User Avatar */}
+      <div className="ml-4 hidden md:block">
+        <Avatar name={profile?.full_name || 'User'} src={profile?.avatar_url} size={36} />
       </div>
     </header>
   );

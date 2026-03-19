@@ -26,6 +26,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Schemas array based on role
   const getSchemas = (currentRole: UserRole) => {
@@ -76,6 +77,9 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: any) => {
     const allData = { ...formData, ...data };
+    if (allData['register-email']) {
+      allData.email = allData['register-email'];
+    }
     setFormData(allData);
 
     if (step < totalSteps) {
@@ -134,8 +138,8 @@ export default function RegisterPage() {
       }
 
       // 3. Complete and redirect
-      router.refresh();
-      router.push(`/dashboard/${role}`);
+      await supabase.auth.signOut();
+      setIsSuccess(true);
 
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan saat mendaftar');
@@ -155,6 +159,7 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   placeholder="Masukkan nama sesuai KTP"
+                  autoComplete="off"
                   className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${errors.full_name ? 'border-red-300' : 'border-gray-300'}`}
                   {...register('full_name')}
                 />
@@ -166,6 +171,8 @@ export default function RegisterPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
                   <input
                     type="date"
+                    min="1900-01-01"
+                    max={new Date().toISOString().split('T')[0]}
                     className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.date_of_birth ? 'border-red-300' : 'border-gray-300'}`}
                     {...register('date_of_birth')}
                   />
@@ -190,6 +197,7 @@ export default function RegisterPage() {
                 <input
                   type="tel"
                   placeholder="0812xxxx..."
+                  autoComplete="off"
                   className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.phone ? 'border-red-300' : 'border-gray-300'}`}
                   {...register('phone')}
                 />
@@ -209,10 +217,11 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   placeholder="nama@email.com"
-                  className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.email ? 'border-red-300' : 'border-gray-300'}`}
-                  {...register('email')}
+                  autoComplete="off"
+                  className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors['register-email'] ? 'border-red-300' : 'border-gray-300'}`}
+                  {...register('register-email')}
                 />
-                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message as string}</p>}
+                {errors['register-email'] && <p className="text-xs text-red-500 mt-1">{errors['register-email'].message as string}</p>}
               </div>
 
               <div>
@@ -220,6 +229,7 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   placeholder="Minimal 6 karakter"
+                  autoComplete="new-password"
                   className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.password ? 'border-red-300' : 'border-gray-300'}`}
                   {...register('password')}
                 />
@@ -231,6 +241,7 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   placeholder="Ulangi password"
+                  autoComplete="new-password"
                   className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'}`}
                   {...register('confirmPassword')}
                 />
@@ -251,6 +262,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="dr. Budi Santoso, Sp.A"
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.full_name ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('full_name')}
               />
@@ -261,6 +273,7 @@ export default function RegisterPage() {
               <input
                 type="tel"
                 placeholder="0812xxxx..."
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.phone ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('phone')}
               />
@@ -294,6 +307,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Contoh: SIP-001/JKT/2023"
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.sip_number ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('sip_number')}
               />
@@ -304,6 +318,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Contoh: STR-00123"
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.str_number ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('str_number')}
               />
@@ -313,6 +328,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Nama Faskes tempat Anda berpraktik"
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.hospital ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('hospital')}
               />
@@ -329,16 +345,18 @@ export default function RegisterPage() {
               <input
                 type="email"
                 placeholder="nama@email.com"
-                className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.email ? 'border-red-300' : 'border-gray-300'}`}
-                {...register('email')}
+                autoComplete="off"
+                className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors['register-email'] ? 'border-red-300' : 'border-gray-300'}`}
+                {...register('register-email')}
               />
-              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message as string}</p>}
+              {errors['register-email'] && <p className="text-xs text-red-500 mt-1">{errors['register-email'].message as string}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
                 type="password"
                 placeholder="Minimal 6 karakter"
+                autoComplete="new-password"
                 className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.password ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('password')}
               />
@@ -349,6 +367,7 @@ export default function RegisterPage() {
               <input
                 type="password"
                 placeholder="Ulangi password"
+                autoComplete="new-password"
                 className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('confirmPassword')}
               />
@@ -368,6 +387,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Apt. Siti Nurhaliza, S.Farm"
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.full_name ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('full_name')}
               />
@@ -378,6 +398,7 @@ export default function RegisterPage() {
               <input
                 type="tel"
                 placeholder="0812xxxx..."
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.phone ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('phone')}
               />
@@ -394,6 +415,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Contoh: SIPA-001/JKT/2023"
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.sipa_number ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('sipa_number')}
               />
@@ -404,6 +426,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Nama apotek tempat Anda berpraktik"
+                autoComplete="off"
                 className={`w-full px-4 py-2.5 rounded-lg border outline-none focus:ring-2 focus:ring-blue-500 ${errors.pharmacy_name ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('pharmacy_name')}
               />
@@ -420,16 +443,18 @@ export default function RegisterPage() {
               <input
                 type="email"
                 placeholder="nama@email.com"
-                className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.email ? 'border-red-300' : 'border-gray-300'}`}
-                {...register('email')}
+                autoComplete="off"
+                className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors['register-email'] ? 'border-red-300' : 'border-gray-300'}`}
+                {...register('register-email')}
               />
-              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message as string}</p>}
+              {errors['register-email'] && <p className="text-xs text-red-500 mt-1">{errors['register-email'].message as string}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
                 type="password"
                 placeholder="Minimal 6 karakter"
+                autoComplete="new-password"
                 className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.password ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('password')}
               />
@@ -440,6 +465,7 @@ export default function RegisterPage() {
               <input
                 type="password"
                 placeholder="Ulangi password"
+                autoComplete="new-password"
                 className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'}`}
                 {...register('confirmPassword')}
               />
@@ -477,7 +503,7 @@ export default function RegisterPage() {
         <div className="card p-8 shadow-xl relative overflow-hidden">
           
           {/* Progress Bar (if role is selected) */}
-          {role && (
+          {!isSuccess && role && (
             <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
               <div 
                 className="h-full transition-all duration-300 ease-out bg-blue-500"
@@ -486,26 +512,28 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <div className="mb-8 mt-2">
-            {!role ? (
-              <div className="text-center animate-fadeUp">
-                <h1 className="text-2xl font-serif text-gray-900 mb-2">Pilih Jenis Akun</h1>
-                <p className="text-sm text-gray-600">Bagaimana Anda akan menggunakan TeleZeta?</p>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 animate-slideRight">
-                <button onClick={handleBack} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
-                  <ArrowLeft size={20} />
-                </button>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">
-                    Daftar sebagai {role === 'patient' ? 'Pasien' : role === 'doctor' ? 'Dokter' : 'Apoteker'}
-                  </h1>
-                  <p className="text-xs text-gray-500">Langkah {step} dari {totalSteps}</p>
+          {!isSuccess && (
+            <div className="mb-8 mt-2">
+              {!role ? (
+                <div className="text-center animate-fadeUp">
+                  <h1 className="text-2xl font-serif text-gray-900 mb-2">Pilih Jenis Akun</h1>
+                  <p className="text-sm text-gray-600">Bagaimana Anda akan menggunakan TeleZeta?</p>
                 </div>
-              </div>
-            )}
-          </div>
+              ) : (
+                <div className="flex items-center gap-3 animate-slideRight">
+                  <button onClick={handleBack} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
+                    <ArrowLeft size={20} />
+                  </button>
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-900">
+                      Daftar sebagai {role === 'patient' ? 'Pasien' : role === 'doctor' ? 'Dokter' : 'Apoteker'}
+                    </h1>
+                    <p className="text-xs text-gray-500">Langkah {step} dari {totalSteps}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {error && (
             <div className="mb-6 p-4 rounded-lg flex items-start gap-3 bg-red-50 text-red-600 border border-red-100 animate-slideDown">
@@ -515,7 +543,7 @@ export default function RegisterPage() {
           )}
 
           {/* Role Selection View */}
-          {!role && (
+          {!isSuccess && !role && (
             <div className="space-y-4 animate-fadeUp d1">
               <button
                 onClick={() => setRole('patient')}
@@ -568,8 +596,8 @@ export default function RegisterPage() {
           )}
 
           {/* Form View based on role and step */}
-          {role && (
-            <form onSubmit={handleSubmit(onSubmit)}>
+          {!isSuccess && role && (
+            <form key={String(role) + step} autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
               {renderFields()}
 
               <div className="mt-8 flex gap-3">
@@ -598,6 +626,24 @@ export default function RegisterPage() {
                 </button>
               </div>
             </form>
+          )}
+
+          {/* Success View */}
+          {isSuccess && (
+            <div className="text-center animate-fadeUp py-8">
+              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 size={32} />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Pendaftaran Berhasil!</h2>
+              <p className="text-gray-600 mb-8">Akun berhasil dibuat! Silakan masuk dengan kredensial Anda.</p>
+              <Link
+                href="/login"
+                className="w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl font-semibold text-white shadow-sm hover:shadow transition-all btn-ripple"
+                style={{ background: 'var(--blue-accent)' }}
+              >
+                Masuk Sekarang
+              </Link>
+            </div>
           )}
 
         </div>

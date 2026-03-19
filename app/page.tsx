@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import TeleZetaLogo from '@/components/common/TeleZetaLogo';
 import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
+import ScrollReveal from '@/components/common/ScrollReveal';
 import { MOCK_DOCTORS } from '@/lib/types';
 import type { Doctor, Profile } from '@/lib/types';
 import { ArrowRight, Video, MessageSquare, Clock, Shield, Star, Users, Phone, FileText } from 'lucide-react';
@@ -81,7 +82,7 @@ export default async function LandingPage() {
             <div className="w-96 h-96 rounded-full" style={{ background: 'var(--blue-accent)' }} />
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center animate-fadeUp">
+          <ScrollReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight mb-6">
               Konsultasi Kesehatan <span className="italic" style={{ color: 'var(--blue-accent-light)' }}>Lebih Mudah</span><br />
               Kapan Saja, Di Mana Saja
@@ -100,33 +101,33 @@ export default async function LandingPage() {
             </div>
             
             {/* Quick Stats below hero */}
-            <div className="mt-20 grid grid-cols-2 gap-8 md:grid-cols-4 border-t border-white/10 pt-10">
+            <ScrollReveal staggerChildren className="mt-20 grid grid-cols-2 gap-8 md:grid-cols-4 border-t border-white/10 pt-10">
               {[
                 { label: 'Dokter Spesialis', value: '500+' },
                 { label: 'Pasien Aktif', value: '10K+' },
                 { label: 'Ulasan Positif', value: '4.9/5' },
                 { label: 'Mitra Apotek', value: '200+' },
               ].map((stat, i) => (
-                <div key={i} className={`animate-fadeUp d${i + 2}`}>
+                <div key={i} className="reveal-item">
                   <p className="text-3xl font-serif text-white mb-2">{stat.value}</p>
                   <p className="text-sm font-medium" style={{ color: 'var(--silver-primary)' }}>{stat.label}</p>
                 </div>
               ))}
-            </div>
-          </div>
+            </ScrollReveal>
+          </ScrollReveal>
         </section>
 
         {/* Features Section */}
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-16 animate-fadeUp">
+            <ScrollReveal className="text-center max-w-3xl mx-auto mb-16">
               <h2 className="text-3xl sm:text-4xl text-gray-900 mb-4">Layanan Kesehatan Lengkap dalam Satu Genggaman</h2>
               <p className="text-lg text-gray-600">
                 TeleZeta menyediakan ekosistem kesehatan digital end-to-end untuk kenyamanan Anda dan keluarga.
               </p>
-            </div>
+            </ScrollReveal>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <ScrollReveal staggerChildren className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 { icon: <Video className="w-8 h-8 text-blue-500" />, title: 'Video Call HD', desc: 'Konsultasi tatap muka virtual dengan dokter dari rumah Anda menggunakan kualitas video terbaik.' },
                 { icon: <MessageSquare className="w-8 h-8 text-green-500" />, title: 'Chat Realtime', desc: 'Tanya jawab teks langsung dengan dokter untuk keluhan ringan atau konsultasi lanjutan.' },
@@ -135,7 +136,7 @@ export default async function LandingPage() {
                 { icon: <Shield className="w-8 h-8 text-red-500" />, title: 'Rekam Medis Aman', desc: 'Riwayat kesehatan Anda tersimpan dengan aman dan terenkripsi, mudah diakses jika dibutuhkan.' },
                 { icon: <Users className="w-8 h-8 text-teal-500" />, title: 'Multi Role', desc: 'Platform terintegrasi untuk Pasien, Dokter, dan Apoteker dalam memberikan layanan kesehatan.' },
               ].map((feature, i) => (
-                <div key={i} className="card p-8 hover:-translate-y-2 transition-transform duration-300 shadow-sm hover:shadow-xl rounded-2xl border border-gray-100">
+                <div key={i} className="reveal-item card p-8 hover:-translate-y-2 transition-transform duration-300 shadow-sm hover:shadow-xl rounded-2xl border border-gray-100">
                   <div className="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center mb-6">
                     {feature.icon}
                   </div>
@@ -143,17 +144,17 @@ export default async function LandingPage() {
                   <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
                 </div>
               ))}
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
         {/* Doctor Preview Section */}
         <section className="py-24" style={{ background: 'var(--bg-light)' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+            <ScrollReveal className="flex flex-col md:flex-row justify-between items-end mb-12">
               <div className="max-w-2xl">
-                <h2 className="text-3xl sm:text-4xl text-gray-900 mb-4 animate-slideRight">Dokter Spesialis Siap Membantu</h2>
-                <p className="text-lg text-gray-600 animate-slideRight d1">Pilih dari ratusan dokter spesialis berpengalaman yang telah terverifikasi dan siap memberikan solusi untuk kesehatan Anda.</p>
+                <h2 className="text-3xl sm:text-4xl text-gray-900 mb-4">Dokter Spesialis Siap Membantu</h2>
+                <p className="text-lg text-gray-600">Pilih dari ratusan dokter spesialis berpengalaman yang telah terverifikasi dan siap memberikan solusi untuk kesehatan Anda.</p>
               </div>
               <Link
                 href="/register"
@@ -161,11 +162,11 @@ export default async function LandingPage() {
               >
                 Lihat Semua Dokter <ArrowRight className="ml-1 w-4 h-4" />
               </Link>
-            </div>
+            </ScrollReveal>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <ScrollReveal staggerChildren className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {doctors.map((doctor, i) => (
-                <div key={doctor.id} className={`card p-6 animate-fadeUp d${i + 1}`}>
+                <div key={doctor.id} className="reveal-item card p-6">
                   <div className="flex items-start gap-4 mb-4">
                     <Avatar
                       name={doctor.profiles.full_name}
@@ -206,7 +207,7 @@ export default async function LandingPage() {
                   </div>
                 </div>
               ))}
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -215,7 +216,7 @@ export default async function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl sm:text-4xl text-center text-gray-900 mb-16">Cara Kerja TeleZeta</h2>
             
-            <div className="relative">
+            <ScrollReveal staggerChildren className="relative">
               {/* Connecting line for desktop */}
               <div className="hidden md:block absolute top-12 left-[10%] right-[10%] h-0.5 border-t-2 border-dashed border-gray-200" />
               
@@ -226,7 +227,7 @@ export default async function LandingPage() {
                   { step: '3', title: 'Konfirmasi', desc: 'Tunggu dokter mengkonfirmasi jadwal konsultasi Anda.' },
                   { step: '4', title: 'Dapatkan Resep', desc: 'Setelah selesai, dokter akan memberikan rekam medis dan resep digital.' },
                 ].map((item, i) => (
-                  <div key={i} className="text-center">
+                  <div key={i} className="reveal-item text-center">
                     <div className="w-24 h-24 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-6 shadow-sm border-4 border-white relative">
                       <span className="text-3xl font-bold text-blue-600 font-serif">{item.step}</span>
                     </div>
@@ -235,7 +236,7 @@ export default async function LandingPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -245,7 +246,7 @@ export default async function LandingPage() {
           style={{ background: 'var(--navy-primary)' }}
         >
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at center, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-          <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <ScrollReveal className="max-w-4xl mx-auto px-4 text-center relative z-10">
             <h2 className="text-3xl sm:text-4xl text-white mb-6">Siap Memulai Konsultasi Pertama Anda?</h2>
             <p className="text-xl mb-10 text-blue-100 max-w-2xl mx-auto">
               Bergabung dengan ribuan pasien lainnya yang mempercayakan kesehatan mereka pada layanan dokter ahli dari TeleZeta.
@@ -264,7 +265,7 @@ export default async function LandingPage() {
                 Masuk
               </Link>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
       </main>
 
@@ -306,7 +307,7 @@ export default async function LandingPage() {
           </div>
           <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-500 text-sm text-center md:text-left">
-              © {new Date().getFullYear()} TeleZeta Indonesia. Diperuntukkan sebagai Tugas Akhir Kuliah.
+              © {new Date().getFullYear()} TeleZeta Telemedicine. Diperuntukkan sebagai Tugas Mata Kuliah Telemedicine Ranu.
             </p>
           </div>
         </div>

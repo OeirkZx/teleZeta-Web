@@ -19,6 +19,7 @@ export default function PharmacistDashboard() {
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [stats, setStats] = useState({ new: 0, processing: 0, ready: 0, completed_today: 0 });
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -61,6 +62,7 @@ export default function PharmacistDashboard() {
 
       } catch (err) {
         console.error('[TeleZeta] Failed to fetch pharmacist dashboard:', err);
+        setErrorMsg('Gagal memuat data pesanan apotek. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);
       }
@@ -74,6 +76,18 @@ export default function PharmacistDashboard() {
         <Skeleton width="100%" height={160} borderRadius={24} />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[1,2,3,4].map(i => <Skeleton key={i} height={120} borderRadius={24} />)}
+        </div>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+        <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+          <AlertCircle className="w-10 h-10 mb-3 opacity-80" />
+          <h3 className="text-xl font-bold mb-1">Terjadi Kesalahan</h3>
+          <p>{errorMsg}</p>
         </div>
       </div>
     );

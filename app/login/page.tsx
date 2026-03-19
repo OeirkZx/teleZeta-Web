@@ -41,7 +41,13 @@ function LoginForm() {
       });
 
       if (signInError) {
-        throw new Error('Email atau password salah');
+        if (signInError.message.includes('Invalid login credentials')) {
+          throw new Error('Email atau password yang Anda masukkan salah');
+        } else if (signInError.message.includes('Email not confirmed')) {
+          throw new Error('Akun Anda belum dikonfirmasi, hubungi administrator');
+        } else {
+          throw new Error('Terjadi kesalahan, silakan coba lagi');
+        }
       }
 
       // Refresh router to trigger middleware and redirect to correct dashboard
@@ -79,7 +85,7 @@ function LoginForm() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5" htmlFor="email">
               Alamat Email
@@ -92,6 +98,8 @@ function LoginForm() {
                 id="email"
                 type="email"
                 placeholder="nama@email.com"
+                autoComplete="username"
+                defaultValue=""
                 className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
                   errors.email ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'
                 } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
@@ -120,7 +128,9 @@ function LoginForm() {
               <input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Masukkan password Anda"
+                autoComplete="new-password"
+                defaultValue=""
                 className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
                   errors.password ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'
                 } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}

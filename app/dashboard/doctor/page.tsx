@@ -11,7 +11,7 @@ import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { MOCK_APPOINTMENTS } from '@/lib/types';
 import { formatTime } from '@/lib/utils/formatters';
-import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings, MessageSquare, Power } from 'lucide-react';
+import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings, MessageSquare, Power, AlertCircle } from 'lucide-react';
 
 export default function DoctorDashboard() {
   const { user, profile } = useAuth();
@@ -22,6 +22,7 @@ export default function DoctorDashboard() {
   const [stats, setStats] = useState({ total_patients: 0, pending_appointments: 0, completed_today: 0 });
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -77,6 +78,7 @@ export default function DoctorDashboard() {
 
       } catch (err) {
         console.error('[TeleZeta] Failed to fetch doctor dashboard:', err);
+        setErrorMsg('Gagal memuat data dashboard. Silakan coba lagi nanti.');
       } finally {
         setLoading(false);
       }
@@ -115,6 +117,18 @@ export default function DoctorDashboard() {
           <Skeleton height={140} borderRadius={24} />
           <Skeleton height={140} borderRadius={24} />
           <Skeleton height={140} borderRadius={24} />
+        </div>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+        <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+          <AlertCircle className="w-10 h-10 mb-3 opacity-80" />
+          <h3 className="text-xl font-bold mb-1">Terjadi Kesalahan</h3>
+          <p>{errorMsg}</p>
         </div>
       </div>
     );

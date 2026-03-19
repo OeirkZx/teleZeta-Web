@@ -9,7 +9,7 @@ import { MOCK_MEDICAL_RECORDS } from '@/lib/types';
 import type { MedicalRecord } from '@/lib/types';
 import { formatTime } from '@/lib/utils/formatters';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { FileText, Calendar, Activity, Syringe, HeartPulse, Search, User } from 'lucide-react';
+import { FileText, Calendar, Activity, Syringe, HeartPulse, Search, User, AlertCircle } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 
 // Helper type for joined query
@@ -33,6 +33,7 @@ export default function PatientRecords() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<EnrichedRecord | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchRecords() {
@@ -63,8 +64,7 @@ export default function PatientRecords() {
         }
       } catch (err) {
         console.error('[TeleZeta] Failed to fetch medical records:', err);
-        // Fallback for UI visualization
-        setRecords(MOCK_MEDICAL_RECORDS as any[]);
+        setErrorMsg('Gagal memuat riwayat rekam medis. Silakan coba lagi.');
       } finally {
         setLoading(false);
       }
@@ -97,7 +97,13 @@ export default function PatientRecords() {
         </div>
       </div>
 
-      {loading ? (
+      {errorMsg ? (
+        <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+          <AlertCircle className="w-10 h-10 mb-3 opacity-80" />
+          <h3 className="text-xl font-bold mb-1">Terjadi Kesalahan</h3>
+          <p>{errorMsg}</p>
+        </div>
+      ) : loading ? (
         <div className="grid md:grid-cols-2 gap-6">
           {[1,2,3,4].map(i => <Skeleton key={i} width="100%" height={220} borderRadius={24} />)}
         </div>

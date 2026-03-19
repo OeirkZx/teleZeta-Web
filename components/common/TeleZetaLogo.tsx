@@ -12,9 +12,9 @@ interface TeleZetaLogoProps {
 }
 
 const sizes = {
-  sm: { height: 24, width: 72 },
-  md: { height: 32, width: 96 },
-  lg: { height: 48, width: 144 },
+  sm: { height: 81, width: 243 },
+  md: { height: 108, width: 324 },
+  lg: { height: 162, width: 486 },
 };
 
 // Fallback SVG — huruf Z dengan node/connection points
@@ -24,7 +24,7 @@ function LogoSVG({ variant, size }: { variant: 'dark' | 'light'; size: 'sm' | 'm
   const accentColor = variant === 'light' ? '#A8BCD4' : '#1A3A68';
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 animate-float">
       <svg width={h} height={h} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         {/* Z shape with connection nodes */}
         <line x1="8" y1="8" x2="32" y2="8" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
@@ -58,15 +58,17 @@ export default function TeleZetaLogo({ variant = 'auto', size = 'md', showText =
   const resolvedVariant = variant === 'auto' ? 'dark' : variant;
   const { height, width } = sizes[size];
 
+  const imgSrc = resolvedVariant === 'light' ? '/logo-light.png' : '/logo-dark.png';
+
   // If image failed to load, use SVG fallback
   if (imgError) {
     return <LogoSVG variant={resolvedVariant} size={size} />;
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 animate-float">
       <Image
-        src="/logo.png"
+        src={imgSrc}
         alt="TeleZeta Logo"
         width={showText ? width * 2.5 : width}
         height={height}

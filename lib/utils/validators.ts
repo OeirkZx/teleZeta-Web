@@ -8,7 +8,7 @@ import { z } from 'zod';
 // ============================================================
 
 export const loginSchema = z.object({
-  email: z.string().email('Email tidak valid'),
+  email: z.string().email('Format email tidak valid, contoh: nama@email.com'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
 });
 
@@ -22,7 +22,7 @@ export const patientStep1Schema = z.object({
 
 // Patient Registration - Step 2
 export const patientStep2Schema = z.object({
-  email: z.string().email('Email tidak valid'),
+  'register-email': z.string().email('Email tidak valid'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
   confirmPassword: z.string().min(6, 'Konfirmasi password wajib diisi'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -46,7 +46,7 @@ export const doctorStep2Schema = z.object({
 
 // Doctor Registration - Step 3
 export const doctorStep3Schema = z.object({
-  email: z.string().email('Email tidak valid'),
+  'register-email': z.string().email('Email tidak valid'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
   confirmPassword: z.string().min(6, 'Konfirmasi password wajib diisi'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -68,7 +68,7 @@ export const pharmacistStep2Schema = z.object({
 
 // Pharmacist Registration - Step 3
 export const pharmacistStep3Schema = z.object({
-  email: z.string().email('Email tidak valid'),
+  'register-email': z.string().email('Email tidak valid'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
   confirmPassword: z.string().min(6, 'Konfirmasi password wajib diisi'),
 }).refine((data) => data.password === data.confirmPassword, {

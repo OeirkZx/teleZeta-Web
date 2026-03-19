@@ -59,11 +59,11 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
 
   const sidebarContent = (
     <div
-      className="flex flex-col h-full"
+      className="flex flex-col h-full bg-[#0B1F3A]"
       style={{
         background: 'linear-gradient(180deg, #0B1F3A 0%, #112848 100%)',
-        width: 'var(--sidebar-width)',
-        minWidth: 'var(--sidebar-width)',
+        width: 'var(--sidebar-width, 280px)',
+        minWidth: '280px',
       }}
     >
       {/* Logo */}
@@ -142,12 +142,12 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
 
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
+        <div className="md:hidden fixed inset-0 z-[100] flex">
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onMobileClose}
           />
-          <aside className="relative z-10 h-screen animate-slideRight">
+          <aside className="relative z-[100] h-screen animate-slideRight bg-[#0B1F3A] shadow-2xl" style={{ minWidth: '280px' }}>
             {sidebarContent}
           </aside>
         </div>

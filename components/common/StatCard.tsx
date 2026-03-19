@@ -2,6 +2,8 @@
 // Kartu statistik dengan emoji, label, dan value besar
 'use client';
 
+import { useEffect, useState } from 'react';
+
 interface StatCardProps {
   emoji: string;
   label: string;
@@ -11,6 +13,44 @@ interface StatCardProps {
 }
 
 export default function StatCard({ emoji, label, value, delay = 0, trend }: StatCardProps) {
+  const [displayValue, setDisplayValue] = useState<string | number>(0);
+  const isNumeric = typeof value === 'number' || (typeof value === 'string' && !isNaN(Number(value)) && value.trim() !== '');
+
+  useEffect(() => {
+    if (!isNumeric) {
+      setDisplayValue(value);
+      return;
+    }
+    
+    let startTime: number;
+    let animationFrame: number;
+    const duration = 1200; // 1200ms
+    const target = Number(value);
+
+    // ease-out cubic
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const percent = Math.min(progress / duration, 1);
+      
+      const easedPercent = easeOutCubic(percent);
+      const currentVal = Math.floor(easedPercent * target);
+      
+      setDisplayValue(currentVal);
+
+      if (progress < duration) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        setDisplayValue(target);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [value, isNumeric]);
   return (
     <div
       className="card animate-fadeUp"
@@ -30,7 +70,7 @@ export default function StatCard({ emoji, label, value, delay = 0, trend }: Stat
       >
         {label}
       </p>
-      <p className="stat-value">{value}</p>
+      <p className="stat-value">{displayValue}</p>
       {trend && (
         <p
           style={{

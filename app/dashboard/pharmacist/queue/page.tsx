@@ -23,6 +23,7 @@ export default function PharmacistQueue() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<QueueFilter>('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchQueue() {
@@ -44,6 +45,7 @@ export default function PharmacistQueue() {
         setPrescriptions(data || []);
       } catch (err) {
         console.error('[TeleZeta] Failed to fetch queue:', err);
+        setErrorMsg('Gagal memuat daftar antrian. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);
       }
@@ -111,6 +113,18 @@ export default function PharmacistQueue() {
           {[1, 2, 3, 4].map(i => (
             <Skeleton key={i} width="100%" height={140} borderRadius={16} />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+        <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+          <AlertCircle className="w-10 h-10 mb-3 opacity-80" />
+          <h3 className="text-xl font-bold mb-1">Terjadi Kesalahan</h3>
+          <p>{errorMsg}</p>
         </div>
       </div>
     );
