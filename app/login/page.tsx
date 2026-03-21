@@ -20,6 +20,13 @@ function LoginForm() {
   
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Password Reset States
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+
   const supabase = createClient();
 
   const {
@@ -29,6 +36,33 @@ function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail.trim()) {
+      setError('Masukkan email Anda untuk mereset password');
+      return;
+    }
+    
+    setIsResetting(true);
+    setError(null);
+    setResetMessage(null);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      setResetMessage('Link reset password telah dikirim ke email Anda');
+      setResetEmail('');
+    } catch (err: any) {
+      setError(err.message || 'Gagal mengirim link reset password');
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -85,7 +119,65 @@ function LoginForm() {
           </div>
         )}
 
-        <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {resetMessage && (
+          <div className="mb-6 p-4 rounded-lg flex items-start gap-3 bg-green-50 text-green-700 border border-green-100 animate-slideRight">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <p className="text-sm font-medium">{resetMessage}</p>
+          </div>
+        )}
+
+        {showResetForm ? (
+          <form onSubmit={handleResetPassword} className="space-y-6 animate-fadeIn">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5" htmlFor="reset-email">
+                Alamat Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="reset-email"
+                  type="email"
+                  placeholder="nama@email.com"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className={`w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
+                  disabled={isResetting}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                type="submit"
+                disabled={isResetting || !resetEmail}
+                className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-base font-semibold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all hover:-translate-y-0.5 btn-ripple disabled:opacity-50"
+                style={{ background: 'var(--blue-accent)' }}
+              >
+                {isResetting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  'Kirim Link Reset'
+                )}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setShowResetForm(false);
+                  setError(null);
+                  setResetMessage(null);
+                }}
+                className="w-full py-3.5 px-4 rounded-xl font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                disabled={isResetting}
+              >
+                Kembali ke Login
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5" htmlFor="email">
               Alamat Email
@@ -117,9 +209,17 @@ function LoginForm() {
               <label className="block text-sm font-medium text-gray-700" htmlFor="password">
                 Password
               </label>
-              <Link href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+              <button 
+                type="button" 
+                onClick={() => {
+                  setShowResetForm(true);
+                  setError(null);
+                  setResetMessage(null);
+                }} 
+                className="text-sm font-medium text-blue-600 hover:text-blue-500"
+              >
                 Lupa password?
-              </Link>
+              </button>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -156,6 +256,7 @@ function LoginForm() {
             )}
           </button>
         </form>
+        )}
       </div>
 
       <p className="mt-8 text-center text-sm text-gray-600">

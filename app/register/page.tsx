@@ -58,11 +58,10 @@ export default function RegisterPage() {
   // that TS can't narrow, but each render branch only accesses its own step's fields
   const errors = rawErrors as any;
 
-  const handleNext = async () => {
-    const isStepValid = await trigger();
-    if (isStepValid) {
-      setStep(prev => prev + 1);
-    }
+  const handleNext = async (currentStepData: any) => {
+    setFormData((prev: any) => ({ ...prev, ...currentStepData }));
+    setStep(prev => prev + 1);
+    reset({});
   };
 
   const handleBack = () => {
@@ -76,20 +75,27 @@ export default function RegisterPage() {
   };
 
   const onSubmit = async (data: any) => {
-    const allData = { ...formData, ...data };
-    if (allData['register-email']) {
-      allData.email = allData['register-email'];
+    const currentStepData = { ...data };
+    if (currentStepData['register-email']) {
+      currentStepData.email = currentStepData['register-email'];
     }
-    setFormData(allData);
 
     if (step < totalSteps) {
-      handleNext();
+      handleNext(currentStepData);
       return;
     }
 
     // Final submit
+    const allData = { ...formData, ...currentStepData };
+    setFormData(allData);
+
     setIsLoading(true);
     setError(null);
+
+    const capitalizeName = (name: string) => 
+      name.trim().replace(/\b\w/g, l => l.toUpperCase());
+    
+    const finalFullName = allData.full_name ? capitalizeName(allData.full_name) : '';
 
     try {
       // 1. Sign up user
@@ -99,7 +105,7 @@ export default function RegisterPage() {
         options: {
           data: {
             role,
-            full_name: allData.full_name,
+            full_name: finalFullName,
           },
         },
       });
@@ -114,7 +120,7 @@ export default function RegisterPage() {
 
       // 2. Update profiles table with extra data collected during registration
       const { error: profileError } = await supabase.from('profiles').update({
-        full_name: allData.full_name,
+        full_name: finalFullName,
         phone: allData.phone || null,
         date_of_birth: allData.date_of_birth || null,
         gender: allData.gender || null,

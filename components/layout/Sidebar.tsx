@@ -2,6 +2,7 @@
 // Sidebar navigasi dark navy dengan gradient background
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import TeleZetaLogo from '@/components/common/TeleZetaLogo';
@@ -9,7 +10,7 @@ import Avatar from '@/components/common/Avatar';
 import type { Profile, UserRole } from '@/lib/types';
 import {
   Home, Search, Calendar, ClipboardList, Pill, User,
-  Clock, Users, FileText, BarChart3, Package, History, LogOut, X
+  Clock, Users, FileText, BarChart3, Package, History, LogOut, X, Loader2
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -55,7 +56,17 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const items = role ? NAV_ITEMS[role] : [];
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await onSignOut();
+    } catch (e) {
+      setIsSigningOut(false);
+    }
+  };
 
   const sidebarContent = (
     <div
@@ -103,13 +114,18 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
 
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-        {items.map((item) => {
+        {items.map((item, index) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
+              style={{
+                opacity: 0,
+                animation: 'fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                animationDelay: `${index * 0.06}s`
+              }}
               onClick={onMobileClose}
             >
               {item.icon}
@@ -122,12 +138,22 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
       {/* Sign Out */}
       <div className="px-3 pb-5 pt-3">
         <button
-          onClick={onSignOut}
-          className="sidebar-nav-item w-full hover:text-red-400"
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+          className="sidebar-nav-item w-full hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#A8BCD4]"
           style={{ color: '#A8BCD4' }}
         >
-          <LogOut size={20} />
-          <span>Keluar</span>
+          {isSigningOut ? (
+            <>
+              <Loader2 size={20} className="animate-spin shrink-0" />
+              <span>Keluar...</span>
+            </>
+          ) : (
+            <>
+              <LogOut size={20} className="shrink-0" />
+              <span>Keluar</span>
+            </>
+          )}
         </button>
       </div>
     </div>

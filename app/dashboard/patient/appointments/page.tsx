@@ -11,7 +11,7 @@ import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { formatTime } from '@/lib/utils/formatters';
-import { Calendar, Clock, Video, MessageSquare, ArrowRight, XCircle, FileText, Share2 } from 'lucide-react';
+import { Calendar, Clock, Video, MessageSquare, ArrowRight, XCircle, FileText, Share2, Star } from 'lucide-react';
 import * as Tabs from '@radix-ui/react-tabs';
 
 type AppointmentWithDoctor = Appointment & { 
@@ -25,6 +25,12 @@ export default function PatientAppointments() {
   const [appointments, setAppointments] = useState<AppointmentWithDoctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
+
+  // Review states
+  const [reviewTargetId, setReviewTargetId] = useState<string | null>(null);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     async function fetchAppointments() {
@@ -73,6 +79,36 @@ export default function PatientAppointments() {
       alert('Gagal membatalkan jadwal. Silakan coba lagi.');
     } finally {
       setCancelingId(null);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewTargetId || !user) return;
+    setSubmittingReview(true);
+    
+    try {
+      const targetApp = appointments.find(a => a.id === reviewTargetId);
+      if (!targetApp) throw new Error("Appointment not found");
+
+      const { error } = await supabase.from('reviews').insert({
+        appointment_id: reviewTargetId,
+        patient_id: user.id,
+        doctor_id: targetApp.doctor_id,
+        rating: reviewRating,
+        comment: reviewComment
+      });
+
+      if (error) throw error;
+      
+      alert('Terima kasih atas ulasan Anda!');
+      setReviewTargetId(null);
+      setReviewRating(5);
+      setReviewComment('');
+    } catch (err: any) {
+      console.error('[TeleZeta] Failed to submit review:', err);
+      alert('Gagal mengirim ulasan: ' + err.message);
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -151,9 +187,10 @@ export default function PatientAppointments() {
                   <FileText className="w-4 h-4 mr-2" /> Rekam Medis
                 </Link>
                 <button
+                  onClick={() => setReviewTargetId(app.id)}
                   className="w-full md:w-auto px-5 py-2.5 rounded-xl font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors flex items-center justify-center text-sm"
                 >
-                  Beri Ulasan
+                  <Star className="w-4 h-4 mr-2" /> Beri Ulasan
                 </button>
               </>
             ) : null}
@@ -241,6 +278,72 @@ export default function PatientAppointments() {
           )}
         </Tabs.Content>
       </Tabs.Root>
+
+      {/* Review Modal */}
+      {reviewTargetId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl animate-popIn">
+            <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-4">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" /> Beri Ulasan
+              </h3>
+              <button 
+                onClick={() => setReviewTargetId(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                title="Tutup"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <label className="block font-medium text-gray-700 mb-2">Penilaian Anda</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button 
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className="p-1 transition-transform hover:scale-110 focus:outline-none"
+                    title={`Beri ${star} bintang`}
+                  >
+                    <Star 
+                      className={`w-8 h-8 ${reviewRating >= star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <label className="block font-medium text-gray-700 mb-2">Pesan atau Kesan (Opsional)</label>
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder="Ceritakan pengalaman konsultasi Anda..."
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none h-28"
+              />
+            </div>
+            
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setReviewTargetId(null)}
+                className="px-5 py-2.5 rounded-xl font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSubmitReview}
+                disabled={submittingReview}
+                className="px-5 py-2.5 rounded-xl font-bold text-white shadow-md disabled:opacity-70 flex items-center justify-center min-w-[120px]"
+                style={{ background: 'var(--blue-accent)' }}
+              >
+                {submittingReview ? 'Mengirim...' : 'Kirim Ulasan'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

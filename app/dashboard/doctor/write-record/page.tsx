@@ -130,18 +130,35 @@ export default function WriteRecord() {
 
       // 2. Insert Prescription if any meds
       if (data.medications && data.medications.length > 0) {
-        const { error: presError } = await supabase
+        const { data: prescriptionData, error: presError } = await supabase
           .from('prescriptions')
           .insert({
             appointment_id: appointment.id,
+            medical_record_id: recordData.id,
             patient_id: appointment.patient_id,
             doctor_id: user.id,
-            medications: data.medications,
-            notes: data.notes,
-            status: 'pending' // waits for patient to redeem
-          });
-          
+            notes: data.notes || '',
+            status: 'pending'
+          })
+          .select()
+          .single();
+
         if (presError) throw presError;
+
+        const prescriptionItems = data.medications.map(med => ({
+          prescription_id: prescriptionData.id,
+          medicine_name: med.name,
+          dosage: med.dosage || '',
+          frequency: med.frequency,
+          quantity: 1,
+          instructions: med.duration || '',
+        }));
+
+        const { error: itemsError } = await supabase
+          .from('prescription_items')
+          .insert(prescriptionItems);
+
+        if (itemsError) throw itemsError;
       }
 
       // 3. Update appointment status to completed if it isn't already

@@ -38,8 +38,8 @@ export default function ScrollReveal({ children, className = '', staggerChildren
         });
       },
       {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
+        threshold: 0.08,
+        rootMargin: '0px 0px -60px 0px',
       }
     );
 

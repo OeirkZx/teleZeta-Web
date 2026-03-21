@@ -109,7 +109,7 @@ export const medicalRecordSchema = z.object({
 
 export const profileUpdateSchema = z.object({
   full_name: z.string().min(3, 'Nama minimal 3 karakter'),
-  phone: z.string().min(10, 'Nomor telepon minimal 10 digit').optional(),
+  phone: z.string().min(10, 'Nomor telepon minimal 10 digit').optional().or(z.literal('')),
   date_of_birth: z.string().optional(),
   gender: z.enum(['L', 'P']).optional(),
   city: z.string().optional(),

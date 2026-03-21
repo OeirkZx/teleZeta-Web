@@ -113,6 +113,7 @@ export default function PharmacistInventory() {
               : item
           )
         );
+        alert('Stok obat berhasil diperbarui!');
       } else {
         // Create new
         const newItem: InventoryItem = {
@@ -135,6 +136,7 @@ export default function PharmacistInventory() {
         setItems(prev => [...prev, newItem].sort((a, b) =>
           a.medicine_name.localeCompare(b.medicine_name)
         ));
+        alert('Obat baru berhasil ditambahkan!');
       }
 
       setDialogOpen(false);

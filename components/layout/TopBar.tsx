@@ -6,18 +6,17 @@ import { useState, useRef, useEffect } from 'react';
 import { Bell, Menu } from 'lucide-react';
 import { useNotifications } from '@/lib/hooks/useNotifications';
 import { formatRelativeTime } from '@/lib/utils/formatters';
-import type { Notification } from '@/lib/types';
-import { useAuth } from '@/lib/hooks/useAuth';
+import type { Notification, Profile } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 
 interface TopBarProps {
   userId: string | null;
+  profile: Profile | null;
   onMenuClick?: () => void;
 }
 
-export default function TopBar({ userId, onMenuClick }: TopBarProps) {
+export default function TopBar({ userId, profile, onMenuClick }: TopBarProps) {
   const { notifications: realNotifications, unreadCount: realUnread, markAsRead, markAllAsRead } = useNotifications(userId);
-  const { profile } = useAuth();
   const [showNotifs, setShowNotifs] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 

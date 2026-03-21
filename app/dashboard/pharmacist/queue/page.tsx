@@ -26,6 +26,8 @@ export default function PharmacistQueue() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    let subscription: any = null;
+
     async function fetchQueue() {
       if (!user) return;
       try {
@@ -50,7 +52,27 @@ export default function PharmacistQueue() {
         setLoading(false);
       }
     }
+
     fetchQueue();
+
+    if (user) {
+      subscription = supabase
+        .channel('pharmacist-queue-changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'prescriptions' },
+          () => {
+            fetchQueue();
+          }
+        )
+        .subscribe();
+    }
+
+    return () => {
+      if (subscription) {
+        supabase.removeChannel(subscription);
+      }
+    };
   }, [user, supabase]);
 
   const handleUpdateStatus = async (id: string, newStatus: 'ready' | 'dispensed') => {

@@ -50,7 +50,7 @@ export default function DoctorStats() {
           return { month: d.toLocaleDateString('id-ID', { month: 'short' }), count: 0 };
         });
 
-        apps?.forEach(app => {
+        (apps || []).forEach(app => {
           patients.add(app.patient_id);
           if (app.status === 'completed') completed++;
           if (app.status === 'pending' || app.status === 'confirmed' || app.status === 'ongoing') pending++;

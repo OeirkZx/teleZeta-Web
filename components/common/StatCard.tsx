@@ -14,43 +14,59 @@ interface StatCardProps {
 
 export default function StatCard({ emoji, label, value, delay = 0, trend }: StatCardProps) {
   const [displayValue, setDisplayValue] = useState<string | number>(0);
-  const isNumeric = typeof value === 'number' || (typeof value === 'string' && !isNaN(Number(value)) && value.trim() !== '');
 
   useEffect(() => {
-    if (!isNumeric) {
+    const prefersReducedMotion = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+    
+    const strVal = String(value);
+    const match = strVal.match(/^([0-9.]+)(.*)$/);
+    
+    if (!match || prefersReducedMotion) {
       setDisplayValue(value);
       return;
     }
     
+    const numStr = match[1];
+    const suffix = match[2];
+    const target = Number(numStr);
+    
+    if (isNaN(target)) {
+      setDisplayValue(value);
+      return;
+    }
+    
+    const hasDecimal = numStr.includes('.');
+    const decimalPlaces = hasDecimal ? numStr.split('.')[1].length : 0;
+
     let startTime: number;
     let animationFrame: number;
-    const duration = 1200; // 1200ms
-    const target = Number(value);
+    const duration = 1400; // 1400ms
 
-    // ease-out cubic
-    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+    const easeOutExpo = (t: number): number => 
+      t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
 
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = timestamp - startTime;
       const percent = Math.min(progress / duration, 1);
       
-      const easedPercent = easeOutCubic(percent);
-      const currentVal = Math.floor(easedPercent * target);
+      const easedPercent = easeOutExpo(percent);
+      const currentVal = easedPercent * target;
       
-      setDisplayValue(currentVal);
+      const formattedVal = hasDecimal ? currentVal.toFixed(decimalPlaces) : Math.floor(currentVal);
+      setDisplayValue(`${formattedVal}${suffix}`);
 
       if (progress < duration) {
         animationFrame = requestAnimationFrame(animate);
       } else {
-        setDisplayValue(target);
+        setDisplayValue(value);
       }
     };
 
     animationFrame = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(animationFrame);
-  }, [value, isNumeric]);
+  }, [value]);
   return (
     <div
       className="card animate-fadeUp"

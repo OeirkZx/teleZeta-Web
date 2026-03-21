@@ -14,6 +14,8 @@ export function useNotifications(userId: string | null) {
 
   // Fetch existing notifications
   useEffect(() => {
+    let isMounted = true;
+
     if (!userId) {
       setLoading(false);
       return;
@@ -30,18 +32,24 @@ export function useNotifications(userId: string | null) {
 
         if (error) {
           console.log('[TeleZeta] Error fetching notifications:', error.message);
-        } else {
+        } else if (isMounted) {
           setNotifications(data || []);
           setUnreadCount(data?.filter((n: Notification) => !n.is_read).length || 0);
         }
       } catch (err) {
         console.log('[TeleZeta] Notifications fetch failed:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchNotifications();
+
+    return () => {
+      isMounted = false;
+    };
   }, [userId, supabase]);
 
   // Subscribe to new notifications

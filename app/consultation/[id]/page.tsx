@@ -155,7 +155,7 @@ export default function ConsultationRoom({ params }: { params: { id: string } })
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
     
-    sendMessage(user.id, newMessage);
+    sendMessage(newMessage, user.id);
     setNewMessage('');
   };
 
@@ -261,7 +261,7 @@ export default function ConsultationRoom({ params }: { params: { id: string } })
 
         {/* Chat Area */}
         <div className={`flex flex-col bg-white border-l border-gray-200 ${
-          appointment.consultation_type === 'video' ? 'w-full md:w-96 lg:w-[400px] h-[50vh] md:h-full block shrink-0' : 'flex-1 h-full'
+          appointment.consultation_type === 'video' ? 'w-full md:w-96 lg:w-[400px] h-[50vh] md:h-full block shrink-0' : 'flex-1 w-full h-full min-h-0'
         }`}>
           
           <div className="p-4 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50 shrink-0">

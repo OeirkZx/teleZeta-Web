@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import type { Profile, Appointment } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { User, Search, Activity, Calendar, History, ArrowRight } from 'lucide-react';
+import { User, Search, Activity, Calendar, History, ArrowRight, Users } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 
 // Helper type to group patients with their latest appointment
@@ -222,6 +222,3 @@ export default function DoctorPatientsList() {
     </div>
   );
 }
-
-// Dummy icon to fix error if Users was not imported, actually it's missing in import
-import { Users } from 'lucide-react';

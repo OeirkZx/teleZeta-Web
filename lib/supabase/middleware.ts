@@ -20,6 +20,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.next({ request })
   }
 
+  const hasCookies = request.cookies.getAll().length > 0
+  if (!hasCookies) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -48,14 +53,15 @@ export async function updateSession(request: NextRequest) {
   )
 
   // Refresh session - IMPORTANT: do not remove this
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { session }, error } = await supabase.auth.getSession()
+
+  // Hanya anggap user authenticated jika session valid DAN tidak error
+  const isAuthenticated = !error && session !== null && session.user !== null
 
   const { pathname } = request.nextUrl
 
   // Protected routes: redirect to login if not authenticated
-  if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/consultation'))) {
+  if (!isAuthenticated && (pathname.startsWith('/dashboard') || pathname.startsWith('/consultation'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('message', 'Silakan masuk terlebih dahulu')
@@ -63,7 +69,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect authenticated users away from login/register
-  if (user && (pathname === '/login' || pathname === '/register')) {
+  if (isAuthenticated && (pathname === '/login' || pathname === '/register')) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
