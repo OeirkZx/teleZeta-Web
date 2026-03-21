@@ -112,7 +112,19 @@ export default function RegisterPage() {
       // Wait a moment for the DB trigger to build the profile
       await new Promise(r => setTimeout(r, 1000));
 
-      // 2. Insert role-specific data using admin privileges or normal insert 
+      // 2. Update profiles table with extra data collected during registration
+      const { error: profileError } = await supabase.from('profiles').update({
+        full_name: allData.full_name,
+        phone: allData.phone || null,
+        date_of_birth: allData.date_of_birth || null,
+        gender: allData.gender || null,
+      }).eq('id', userId);
+
+      if (profileError) {
+        console.error('[TeleZeta] Error updating profile:', profileError);
+      }
+
+      // 3. Insert role-specific data using admin privileges or normal insert 
       // (Since trigger creates profile, RLS should allow inserting own data to doctors/pharmacists)
       if (role === 'doctor') {
         const { error: doctorError } = await supabase.from('doctors').insert({
@@ -137,7 +149,7 @@ export default function RegisterPage() {
         }
       }
 
-      // 3. Complete and redirect
+      // 4. Complete and redirect
       await supabase.auth.signOut();
       setIsSuccess(true);
 
