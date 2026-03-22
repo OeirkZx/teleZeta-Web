@@ -56,16 +56,13 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const items = role ? NAV_ITEMS[role] : [];
 
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await onSignOut();
-    } catch (e) {
-      setIsSigningOut(false);
-    }
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await onSignOut();
+    // isLoggingOut tidak perlu di-reset karena halaman akan redirect
   };
 
   const sidebarContent = (
@@ -138,19 +135,19 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
       {/* Sign Out */}
       <div className="px-3 pb-5 pt-3">
         <button
-          onClick={handleSignOut}
-          disabled={isSigningOut}
-          className="sidebar-nav-item w-full hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#A8BCD4]"
-          style={{ color: '#A8BCD4' }}
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="sidebar-nav-item w-full hover:text-red-400"
+          style={{ color: isLoggingOut ? '#9CA3AF' : '#A8BCD4' }}
         >
-          {isSigningOut ? (
+          {isLoggingOut ? (
             <>
-              <Loader2 size={20} className="animate-spin shrink-0" />
+              <span className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
               <span>Keluar...</span>
             </>
           ) : (
             <>
-              <LogOut size={20} className="shrink-0" />
+              <LogOut size={20} />
               <span>Keluar</span>
             </>
           )}

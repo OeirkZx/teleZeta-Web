@@ -105,10 +105,38 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-      window.location.href = '/';
+      // Set loading state dulu agar UI memberikan feedback
+      setState(prev => ({ ...prev, loading: true }));
+      
+      // Panggil signOut dari Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('[TeleZeta] Sign out error:', error);
+      }
+      
+      // Reset state secara manual untuk memastikan
+      // tidak ada sisa data user di memory
+      setState({
+        user: null,
+        profile: null,
+        role: null,
+        loading: false,
+        error: null,
+      });
+      
+      // Tunggu sebentar agar cookie benar-benar terhapus
+      // sebelum melakukan redirect
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Gunakan replace agar tidak bisa back ke halaman dashboard
+      // setelah logout
+      window.location.replace('/login');
+      
     } catch (err) {
-      console.log('[TeleZeta] Sign out error:', err);
+      console.error('[TeleZeta] Sign out failed:', err);
+      // Force redirect meskipun ada error
+      window.location.replace('/login');
     }
   };
 
