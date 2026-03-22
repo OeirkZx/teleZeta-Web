@@ -12,6 +12,7 @@ interface AvatarProps {
   size?: number;
   pulse?: boolean;
   borderColor?: string;
+  onClick?: () => void;
 }
 
 // Color palette untuk avatar gradient berdasarkan huruf pertama
@@ -31,14 +32,23 @@ function getColorPair(name: string): string[] {
   return AVATAR_COLORS[idx];
 }
 
-export default function Avatar({ name, src, size = 40, pulse = false, borderColor }: AvatarProps) {
+export default function Avatar({ name, src, size = 40, pulse = false, borderColor, onClick }: AvatarProps) {
   const [imgError, setImgError] = useState(false);
   const initials = getInitials(name);
   const [color1, color2] = getColorPair(name);
 
+  const hoverStyles = onClick ? {
+    transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+    cursor: 'pointer',
+  } : {};
+
   if (src && !imgError) {
     return (
-      <div className="relative" style={{ width: size, height: size }}>
+      <div 
+        className={`relative ${onClick ? 'hover:scale-105 hover:shadow-[0_8px_20px_rgba(0,0,0,0.2)]' : ''}`} 
+        style={{ width: size, height: size, ...hoverStyles }}
+        onClick={onClick}
+      >
         <Image
           src={src}
           alt={name}
@@ -65,7 +75,11 @@ export default function Avatar({ name, src, size = 40, pulse = false, borderColo
   }
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
+    <div 
+      className={`relative ${onClick ? 'hover:scale-105 hover:shadow-[0_8px_20px_rgba(0,0,0,0.2)]' : ''}`} 
+      style={{ width: size, height: size, ...hoverStyles }}
+      onClick={onClick}
+    >
       <div
         className="rounded-full flex items-center justify-center text-white font-semibold"
         style={{

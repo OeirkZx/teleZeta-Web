@@ -120,8 +120,7 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
               className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
               style={{
                 opacity: 0,
-                animation: 'fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-                animationDelay: `${index * 0.06}s`
+                animation: `fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.055}s both`
               }}
               onClick={onMobileClose}
             >
@@ -167,10 +166,14 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-[100] flex">
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn"
             onClick={onMobileClose}
+            style={{ transition: 'opacity 0.3s ease' }}
           />
-          <aside className="relative z-[100] h-screen animate-slideRight bg-[#0B1F3A] shadow-2xl" style={{ minWidth: '280px' }}>
+          <aside 
+            className="relative z-[100] h-screen animate-slideRight bg-[#0B1F3A] shadow-2xl" 
+            style={{ minWidth: '280px', transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)' }}
+          >
             {sidebarContent}
           </aside>
         </div>

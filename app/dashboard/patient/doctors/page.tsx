@@ -193,10 +193,17 @@ export default function DoctorsPage() {
           ))}
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeUp d2">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDoctors.length > 0 ? (
-            filteredDoctors.map(doc => (
-              <div key={doc.id} className="card p-6 flex flex-col h-full bg-white hover:-translate-y-1 transition-transform">
+            filteredDoctors.map((doc, index) => (
+              <div 
+                key={doc.id} 
+                className="card p-6 flex flex-col h-full bg-white hover:-translate-y-1 transition-transform"
+                style={{
+                  opacity: index < 8 ? 0 : 1,
+                  animation: index < 8 ? `fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s both` : 'none'
+                }}
+              >
                 <div className="flex gap-4 mb-4">
                   <Avatar
                     name={doc.profiles?.full_name || 'Dokter'}

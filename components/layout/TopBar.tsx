@@ -96,7 +96,7 @@ export default function TopBar({ userId, profile, onMenuClick }: TopBarProps) {
         {showNotifs && (
           <div
             className="absolute right-0 top-12 w-80 card animate-slideDown overflow-hidden"
-            style={{ maxHeight: 400 }}
+            style={{ maxHeight: 400, transition: 'opacity 0.2s ease' }}
           >
             <div
               className="flex items-center justify-between px-4 py-3"

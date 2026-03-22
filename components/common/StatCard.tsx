@@ -17,52 +17,53 @@ export default function StatCard({ emoji, label, value, delay = 0, trend }: Stat
 
   useEffect(() => {
     const prefersReducedMotion = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
-    
-    const strVal = String(value);
-    const match = strVal.match(/^([0-9.]+)(.*)$/);
-    
-    if (!match || prefersReducedMotion) {
-      setDisplayValue(value);
-      return;
-    }
-    
-    const numStr = match[1];
-    const suffix = match[2];
-    const target = Number(numStr);
-    
-    if (isNaN(target)) {
-      setDisplayValue(value);
-      return;
-    }
-    
-    const hasDecimal = numStr.includes('.');
-    const decimalPlaces = hasDecimal ? numStr.split('.')[1].length : 0;
 
-    let startTime: number;
+    if (prefersReducedMotion) {
+      setDisplayValue(value);
+      return;
+    }
+
+    // Parse nilai numerik dari value (handle "2.4M", "68%", dll)
+    const rawValue = String(value);
+    const numericMatch = rawValue.match(/[\d.]+/);
+    if (!numericMatch) {
+      setDisplayValue(value);
+      return; // Jika tidak ada angka, skip animasi
+    }
+    
+    const targetNum = parseFloat(numericMatch[0]);
+    const prefix = rawValue.slice(0, numericMatch.index);
+    const suffix = rawValue.slice(
+      (numericMatch.index || 0) + numericMatch[0].length
+    );
+    
+    const duration = 1400;
+    const startTime = performance.now();
     let animationFrame: number;
-    const duration = 1400; // 1400ms
-
-    const easeOutExpo = (t: number): number => 
+    
+    // easeOutExpo: mulai cepat, melambat di akhir
+    const easeOutExpo = (t: number) =>
       t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = timestamp - startTime;
-      const percent = Math.min(progress / duration, 1);
+    
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutExpo(progress);
       
-      const easedPercent = easeOutExpo(percent);
-      const currentVal = easedPercent * target;
+      const currentNum = targetNum * easedProgress;
       
-      const formattedVal = hasDecimal ? currentVal.toFixed(decimalPlaces) : Math.floor(currentVal);
-      setDisplayValue(`${formattedVal}${suffix}`);
-
-      if (progress < duration) {
+      // Format angka sesuai tipe aslinya
+      const formatted = Number.isInteger(targetNum)
+        ? Math.round(currentNum).toString()
+        : currentNum.toFixed(1);
+      
+      setDisplayValue(`${prefix}${formatted}${suffix}`);
+      
+      if (progress < 1) {
         animationFrame = requestAnimationFrame(animate);
-      } else {
-        setDisplayValue(value);
       }
     };
-
+    
     animationFrame = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(animationFrame);

@@ -1,6 +1,16 @@
-@import "tailwindcss";
+const fs = require('fs');
 
-/* ============================================================
+const cssFile = '/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/globals.css';
+let css = fs.readFileSync(cssFile, 'utf8');
+
+// 1. Replace Animations & Keyframes block
+const startKeyframes = css.indexOf('/* ============================================================');
+const animationsHeader = css.indexOf('Animations & Keyframes', startKeyframes);
+const startStagger = css.indexOf('/* Stagger delay classes */');
+const endStaggerBlock = css.indexOf('/* ---- Common UI Patterns ---- */');
+
+if (animationsHeader !== -1 && startStagger !== -1) {
+  const newAnimationCSS = `/* ============================================================
    Animations & Keyframes
    ============================================================ */
 
@@ -203,24 +213,34 @@
 .d7 { animation-delay: 0.49s; }
 .d8 { animation-delay: 0.56s; }
 
-/* ---- Common UI Patterns ---- */
-.glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(200, 216, 232, 0.5);
-  border-radius: 16px;
+`;
+  
+  // Replace from start of Animations block to before Common UI Patterns
+  const beforeAnimations = css.substring(0, startKeyframes - 1);
+  const afterAnimations = css.substring(endStaggerBlock);
+  css = beforeAnimations + '\n' + newAnimationCSS + afterAnimations;
 }
 
-.card {
+// Ensure the other replacements hit the new string correctly by using regexes:
+
+// Replace .card transition
+css = css.replace(
+  /\.card\s*{[^}]*transition:[^}]*}/g,
+  `.card {
   background: #FFFFFF;
   border-radius: 16px;
   border: 1px solid var(--border-color);
   box-shadow: 0 1px 3px rgba(11, 31, 58, 0.04);
   transition: box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
               border-color 0.2s ease;
-}
+}`
+);
 
-.card-clickable {
+// Replace .card:hover
+css = css.replace(/\.card:hover\s*{[^}]*}/g, '');
+
+// Replace card-clickable
+css = css.replace(/\.card-clickable\s*{[^}]*}/g, `.card-clickable {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
               box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
               border-color 0.2s ease;
@@ -228,26 +248,21 @@
   /* Prevent text selection on clickable cards */
   user-select: none;
   -webkit-user-select: none;
-}
-.card-clickable:hover {
+}`);
+
+css = css.replace(/\.card-clickable:hover\s*{[^}]*}/g, `.card-clickable:hover {
   transform: translateY(-5px) scale(1.005);
   box-shadow: 0 20px 48px rgba(11, 31, 58, 0.13),
               0 8px 16px rgba(11, 31, 58, 0.06);
-}
-.card-clickable:active {
+}`);
+
+css = css.replace(/\.card-clickable:active\s*{[^}]*}/g, `.card-clickable:active {
   transform: translateY(-2px) scale(0.998);
   transition-duration: 0.08s;
-}
+}`);
 
-.stat-value {
-  font-family: 'DM Serif Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-/* ---- Button Ripple Effect & Interaction ---- */
-.btn-ripple {
+// Replace btn-ripple
+css = css.replace(/\.btn-ripple\s*{[^}]*}/g, `.btn-ripple {
   position: relative;
   overflow: hidden;
   /* Penting: user-select none agar teks tidak ter-select saat klik */
@@ -257,11 +272,13 @@
               box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
               background-color 0.15s ease,
               opacity 0.15s ease;
-}
-.btn-ripple:hover:not(:disabled) {
+}`);
+
+css = css.replace(/\.btn-ripple:hover\s*{[^}]*}/g, `.btn-ripple:hover:not(:disabled) {
   transform: translateY(-2px);
-}
-.btn-ripple:active:not(:disabled) {
+}`);
+
+css = css.replace(/\.btn-ripple:active\s*{[^}]*}/g, `.btn-ripple:active:not(:disabled) {
   transform: translateY(0) scale(0.97);
   transition-duration: 0.08s;
 }
@@ -269,8 +286,10 @@
 .btn-ripple:disabled {
   cursor: not-allowed;
   opacity: 0.55;
-}
-.btn-ripple::after {
+}`);
+
+// Add ripple effect pseudo element CSS
+css = css.replace(/\.btn-ripple::after\s*{[^}]*}/g, `.btn-ripple::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -285,15 +304,16 @@
   opacity: 0;
   border-radius: inherit;
   pointer-events: none;
-}
-.btn-ripple:active::after {
+}`);
+
+css = css.replace(/\.btn-ripple:active::after\s*{[^}]*}/g, `.btn-ripple:active::after {
   transform: scale(2.5);
   opacity: 1;
   transition-duration: 0s;
-}
+}`);
 
-/* ---- Sidebar styles ---- */
-.sidebar-nav-item {
+// Replace sidebar nav item CSS
+const sidebarContent = `.sidebar-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -323,10 +343,12 @@
   color: #FFFFFF;
   border-left-color: var(--blue-accent);
   transform: translateX(3px);
-}
+}`;
 
-/* ---- Badge styles ---- */
-.badge {
+css = css.replace(/\/\* ---- Sidebar styles ---- \*\/[\s\S]*?\/\* ---- Badge styles ---- \*\//, '/* ---- Sidebar styles ---- */\n' + sidebarContent + '\n\n/* ---- Badge styles ---- */');
+
+// Add to badge styles
+css = css.replace(/\.badge\s*{[^}]*}/, `.badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -337,16 +359,10 @@
   line-height: 1;
   user-select: none;
   -webkit-user-select: none;
-}
-.badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-}
+}`);
 
-/* ---- Skeleton Loading ---- */
-.skeleton {
+// Skeleton
+css = css.replace(/\.skeleton\s*{[^}]*}/, `.skeleton {
   border-radius: 8px;
   background: linear-gradient(
     105deg,
@@ -356,27 +372,10 @@
   );
   background-size: 600px 100%;
   animation: shimmer 2s ease-in-out infinite;
-}
+}`);
 
-/* ---- Toast notification ---- */
-.toast-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* ---- Responsive ---- */
-@media (max-width: 768px) {
-  :root {
-    --sidebar-width: 0px;
-  }
-}
-
-/* ── INPUT FOCUS ── */
+// Input focus
+const inputFocusContent = `/* ── INPUT FOCUS ── */
 /* Tambahkan ini untuk semua input/select/textarea */
 
 input, select, textarea {
@@ -388,9 +387,12 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus {
   outline: none;
   /* Hanya box-shadow yang berubah, bukan ukuran element */
-}
+}`;
 
-/* Reduced motion preference */
+css = css.replace(/\/\* Input field focus styles \*\/[\s\S]*?\/\* Reduced motion preference \*\//, inputFocusContent + '\n\n/* Reduced motion preference */');
+
+// Reduced motion preference replace at bottom
+css = css.replace(/\/\* Reduced motion preference \*\/[\s\S]*$/, `/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -398,4 +400,7 @@ input:focus, select:focus, textarea:focus {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
+}`);
+
+fs.writeFileSync(cssFile, css);
+
