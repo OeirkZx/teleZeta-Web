@@ -201,7 +201,7 @@ export default function DoctorsPage() {
                 className="card p-6 flex flex-col h-full bg-white hover:-translate-y-1 transition-transform"
                 style={{
                   opacity: index < 8 ? 0 : 1,
-                  animation: index < 8 ? `fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s both` : 'none'
+                  animation: index < 8 ? `fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s forwards` : 'none'
                 }}
               >
                 <div className="flex gap-4 mb-4">

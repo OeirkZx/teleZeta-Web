@@ -13,7 +13,7 @@ interface StatCardProps {
 }
 
 export default function StatCard({ emoji, label, value, delay = 0, trend }: StatCardProps) {
-  const [displayValue, setDisplayValue] = useState<string | number>(0);
+  const [displayValue, setDisplayValue] = useState<string | number>(String(value));
 
   useEffect(() => {
     const prefersReducedMotion = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;

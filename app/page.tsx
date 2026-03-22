@@ -82,7 +82,7 @@ export default async function LandingPage() {
             <div className="w-96 h-96 rounded-full" style={{ background: 'var(--blue-accent)' }} />
           </div>
 
-          <ScrollReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center animate-fadeIn">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight mb-6">
               Konsultasi Kesehatan <span className="italic" style={{ color: 'var(--blue-accent-light)' }}>Lebih Mudah</span><br />
               Kapan Saja, Di Mana Saja
@@ -114,7 +114,7 @@ export default async function LandingPage() {
                 </div>
               ))}
             </ScrollReveal>
-          </ScrollReveal>
+          </div>
         </section>
 
         {/* Features Section */}
@@ -246,7 +246,7 @@ export default async function LandingPage() {
           style={{ background: 'var(--navy-primary)' }}
         >
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at center, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-          <ScrollReveal className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <div className="max-w-4xl mx-auto px-4 text-center relative z-10 animate-fadeIn">
             <h2 className="text-3xl sm:text-4xl text-white mb-6">Siap Memulai Konsultasi Pertama Anda?</h2>
             <p className="text-xl mb-10 text-blue-100 max-w-2xl mx-auto">
               Bergabung dengan ribuan pasien lainnya yang mempercayakan kesehatan mereka pada layanan dokter ahli dari TeleZeta.
@@ -265,7 +265,7 @@ export default async function LandingPage() {
                 Masuk
               </Link>
             </div>
-          </ScrollReveal>
+          </div>
         </section>
       </main>
 
