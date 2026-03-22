@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import type { Appointment, Profile } from '@/lib/types';
@@ -19,6 +20,7 @@ type AppointmentWithPatient = Appointment & {
 
 export default function DoctorSchedule() {
   const { user } = useAuth();
+  const router = useRouter();
   const supabase = createClient();
   
   const [appointments, setAppointments] = useState<AppointmentWithPatient[]>([]);
@@ -31,7 +33,7 @@ export default function DoctorSchedule() {
       try {
         const { data, error } = await supabase
           .from('appointments')
-          .select('*, patient:profiles!patient_id(*)')
+          .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url, gender, date_of_birth)')
           .eq('doctor_id', user.id)
           .order('scheduled_at', { ascending: true }); // Earliest first for doctor
 
@@ -135,14 +137,21 @@ export default function DoctorSchedule() {
                 </button>
               </>
             ) : isConfirmed ? (
-              <Link
-                href={`/consultation/${app.id}`}
+              <button
+                onClick={() => {
+                  const appointmentId = app?.id;
+                  if (!appointmentId) {
+                    console.error('[TeleZeta] app.id is undefined:', app);
+                    return;
+                  }
+                  router.push(`/consultation/${appointmentId}`);
+                }}
                 className="w-full md:w-40 px-4 py-3 rounded-xl font-bold flex flex-col items-center justify-center transition-transform hover:-translate-y-0.5 shadow-sm btn-ripple text-sm text-center text-white"
                 style={{ background: 'var(--blue-accent)' }}
               >
                 <ArrowRight className="w-5 h-5 mb-1" />
                 Mulai Konsultasi
-              </Link>
+              </button>
             ) : null}
           </div>
         </div>

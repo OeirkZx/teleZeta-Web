@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import StatCard from '@/components/common/StatCard';
@@ -15,6 +16,7 @@ import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings
 
 export default function DoctorDashboard() {
   const { user, profile } = useAuth();
+  const router = useRouter();
   const supabase = createClient();
 
   const [doctorData, setDoctorData] = useState<any>(null);
@@ -45,7 +47,7 @@ export default function DoctorDashboard() {
 
         const { data: apps } = await supabase
           .from('appointments')
-          .select('*, patient:profiles!patient_id(*)')
+          .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url)')
           .eq('doctor_id', user.id)
           .gte('scheduled_at', today.toISOString())
           .lt('scheduled_at', tomorrow.toISOString())
@@ -206,12 +208,19 @@ export default function DoctorDashboard() {
               >
                 Lihat Rekam Medis
               </Link>
-              <Link
-                href={`/consultation/${nextAppointment.id}`}
+              <button
+                onClick={() => {
+                  const appointmentId = nextAppointment?.id;
+                  if (!appointmentId) {
+                    console.error('[TeleZeta] nextAppointment.id is undefined:', nextAppointment);
+                    return;
+                  }
+                  router.push(`/consultation/${appointmentId}`);
+                }}
                 className="px-6 py-3 rounded-xl font-bold text-green-700 bg-white hover:bg-gray-50 flex items-center justify-center transition-transform hover:-translate-y-0.5 shadow-sm btn-ripple"
               >
                 Mulai Konsultasi <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -303,12 +312,19 @@ export default function DoctorDashboard() {
                         Konfirmasi
                       </Link>
                     ) : (app.status === 'confirmed' || app.status === 'ongoing') ? (
-                      <Link
-                        href={`/consultation/${app.id}`}
+                      <button
+                        onClick={() => {
+                          const appointmentId = app?.id;
+                          if (!appointmentId) {
+                            console.error('[TeleZeta] app.id is undefined:', app);
+                            return;
+                          }
+                          router.push(`/consultation/${appointmentId}`);
+                        }}
                         className="px-4 py-2 rounded-lg text-sm font-semibold bg-green-500 text-white hover:bg-green-600 transition-transform hover:-translate-y-0.5"
                       >
                         Mulai
-                      </Link>
+                      </button>
                     ) : (
                       <span className="text-sm font-medium text-gray-400">Telesai</span>
                     )}
