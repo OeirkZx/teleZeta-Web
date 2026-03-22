@@ -1,7 +1,7 @@
 // [TeleZeta] Consultation Room (Video Call / Chat)
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -17,8 +17,12 @@ import DailyIframe, { DailyCall } from '@daily-co/daily-js';
 // For production, you should create rooms via API. For this demo, we'll use a static room or one from env.
 const DAILY_ROOM_URL = process.env.NEXT_PUBLIC_DAILY_URL || 'https://telezeta.daily.co/demo-room';
 
-export default function ConsultationRoom({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ConsultationRoom({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  const { id } = use(params);
   const router = useRouter();
   const { user, profile: currentUserProfile, role } = useAuth();
   const supabase = createClient();
