@@ -1,79 +1,92 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Animations & Keyframes
+   TeleZeta Design System — Global CSS
    ============================================================ */
 
-/* ── KEYFRAMES ── */
+/* ---- Design Tokens ---- */
+:root {
+  --navy-primary: #0B1F3A;
+  --navy-secondary: #112848;
+  --navy-tertiary: #1A3A68;
+  --blue-accent: #4A9FD4;
+  --blue-accent-light: #6AB8E8;
+  --silver-primary: #A8BCD4;
+  --silver-secondary: #C8D6E8;
+  --silver-bright: #E2EAF4;
+  --bg-light: #EEF3F8;
+  --white-card: #FFFFFF;
+  --text-primary: #0D1C2E;
+  --text-secondary: #3A5878;
+  --text-muted: #6A88A4;
+  --border-color: #C8D8E8;
+  --success: #22C55E;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --sidebar-width: 260px;
+}
+
+/* ---- Base ---- */
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-light);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: 'DM Serif Display', serif;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--silver-primary); border-radius: 3px; }
+
+/* ============================================================
+   Keyframes — SATU blok "to" per keyframe, tanpa filter:blur
+   ============================================================ */
 
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(16px) scale(0.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
 @keyframes pageOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(-12px) scale(1.01); }
+  from { opacity: 1; transform: translateY(0)    scale(1);    }
+  to   { opacity: 0; transform: translateY(-12px) scale(1.01); }
 }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideRight {
   from { opacity: 0; transform: translateX(-16px); }
-  to { opacity: 1; transform: translateX(0); }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-    filter: blur(0);
-  }
+  to   { opacity: 1; transform: translateX(0);     }
 }
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 @keyframes popIn {
-  0% { opacity: 0; transform: scale(0.9); }
-  60% { opacity: 1; transform: scale(1.02); }
-  100% { opacity: 1; transform: scale(1); }
-  65% {
-    opacity: 1;
-    transform: scale(1.03) translateY(-2px);
-    filter: blur(0);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  0%   { opacity: 0; transform: scale(0.9);  }
+  65%  { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1);    }
 }
 
 @keyframes shimmer {
-  0% { background-position: -600px 0; }
-  100% { background-position: 600px 0; }
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
 }
 
 @keyframes spin {
@@ -81,90 +94,59 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
+  0%, 100% { opacity: 1;    }
+  50%       { opacity: 0.45; }
 }
 
 @keyframes pulseRing {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.9); opacity: 0; }
+  0%   { transform: scale(1);   opacity: 0.6; }
+  100% { transform: scale(1.9); opacity: 0;   }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(-0.4deg); }
-  35% { transform: translateY(-7px) rotate(0.3deg); }
-  70% { transform: translateY(-3px) rotate(-0.2deg); }
+  0%, 100% { transform: translateY(0px)  rotate(-0.4deg); }
+  35%       { transform: translateY(-7px) rotate( 0.3deg); }
+  70%       { transform: translateY(-3px) rotate(-0.2deg); }
 }
 
 @keyframes toastIn {
   from { opacity: 0; transform: translateX(100%); }
-  to { opacity: 1; transform: translateX(0); }
-  to {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-    filter: blur(0);
-  }
+  to   { opacity: 1; transform: translateX(0);    }
 }
 
 @keyframes bounceIn {
-  0% { transform: scale(0); opacity: 0; }
-  60% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); }
+  0%   { transform: scale(0);   opacity: 0; }
+  60%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1);               }
 }
 
 @keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(-8deg); }
-  40% { transform: rotate(8deg); }
-  60% { transform: rotate(-5deg); }
-  80% { transform: rotate(5deg); }
+  0%, 100% { transform: rotate(  0deg); }
+  20%       { transform: rotate( -8deg); }
+  40%       { transform: rotate(  8deg); }
+  60%       { transform: rotate( -5deg); }
+  80%       { transform: rotate(  5deg); }
 }
 
-/* ── UTILITY CLASSES ── */
+/* ============================================================
+   Animation Utility Classes
+   ============================================================ */
 
-.animate-pageIn {
-  animation: pageIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-pageOut {
-  animation: pageOut 0.28s cubic-bezier(0.4, 0, 1, 1) both;
-  pointer-events: none;
-}
-.animate-fadeUp {
-  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease both;
-}
-.animate-slideRight {
-  animation: slideRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-slideDown {
-  animation: slideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-popIn {
-  animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-.animate-spin {
-  animation: spin 0.8s linear infinite;
-}
-.animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
-.animate-pulseRing {
-  animation: pulseRing 1.6s ease-out infinite;
-}
-.animate-float {
-  animation: float 4.5s ease-in-out infinite;
-}
-.animate-toastIn {
-  animation: toastIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-bounceIn {
-  animation: bounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-.animate-wiggle {
-  animation: wiggle 0.5s ease both;
-}
+.animate-pageIn    { animation: pageIn    0.50s cubic-bezier(0.22, 1, 0.36, 1)       forwards; }
+.animate-pageOut   { animation: pageOut   0.28s cubic-bezier(0.4,  0, 1,    1)       forwards; pointer-events: none; }
+.animate-fadeUp    { animation: fadeUp    0.50s cubic-bezier(0.22, 1, 0.36, 1)       forwards; }
+.animate-fadeIn    { animation: fadeIn    0.30s ease                                  forwards; }
+.animate-slideRight{ animation: slideRight 0.40s cubic-bezier(0.22, 1, 0.36, 1)      forwards; }
+.animate-slideDown { animation: slideDown  0.30s cubic-bezier(0.22, 1, 0.36, 1)      forwards; }
+.animate-popIn     { animation: popIn     0.45s cubic-bezier(0.34, 1.56, 0.64, 1)    forwards; }
+.animate-spin      { animation: spin      0.80s linear                               infinite; }
+.animate-pulse     { animation: pulse     2.00s ease-in-out                          infinite; }
+.animate-pulseRing { animation: pulseRing 1.60s ease-out                             infinite; }
+.animate-float     { animation: float     4.50s ease-in-out                          infinite; }
+.animate-toastIn   { animation: toastIn   0.45s cubic-bezier(0.22, 1, 0.36, 1)       forwards; }
+.animate-bounceIn  { animation: bounceIn  0.40s cubic-bezier(0.34, 1.56, 0.64, 1)    forwards; }
+.animate-wiggle    { animation: wiggle    0.50s ease                                  forwards; }
+
 .animate-shimmer {
   background: linear-gradient(
     105deg,
@@ -176,7 +158,7 @@
   animation: shimmer 2s ease-in-out infinite;
 }
 
-/* ── STAGGER DELAYS ── */
+/* ---- Stagger delays ---- */
 .d1 { animation-delay: 0.07s; }
 .d2 { animation-delay: 0.14s; }
 .d3 { animation-delay: 0.21s; }
@@ -186,11 +168,14 @@
 .d7 { animation-delay: 0.49s; }
 .d8 { animation-delay: 0.56s; }
 
-/* ---- Common UI Patterns ---- */
+/* ============================================================
+   Common UI Components
+   ============================================================ */
+
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255,255,255,0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(200, 216, 232, 0.5);
+  border: 1px solid rgba(200,216,232,0.5);
   border-radius: 16px;
 }
 
@@ -198,24 +183,22 @@
   background: #FFFFFF;
   border-radius: 16px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 1px 3px rgba(11, 31, 58, 0.04);
-  transition: box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+  box-shadow: 0 1px 3px rgba(11,31,58,0.04);
+  transition: box-shadow 0.25s cubic-bezier(0.22,1,0.36,1),
               border-color 0.2s ease;
 }
 
 .card-clickable {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+  transition: transform   0.30s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow  0.30s cubic-bezier(0.22,1,0.36,1),
               border-color 0.2s ease;
   cursor: pointer;
-  /* Prevent text selection on clickable cards */
   user-select: none;
   -webkit-user-select: none;
 }
 .card-clickable:hover {
-  transform: translateY(-5px) scale(1.005);
-  box-shadow: 0 20px 48px rgba(11, 31, 58, 0.13),
-              0 8px 16px rgba(11, 31, 58, 0.06);
+  transform:  translateY(-5px) scale(1.005);
+  box-shadow: 0 20px 48px rgba(11,31,58,0.13), 0 8px 16px rgba(11,31,58,0.06);
 }
 .card-clickable:active {
   transform: translateY(-2px) scale(0.998);
@@ -229,42 +212,28 @@
   color: var(--text-primary);
 }
 
-/* ---- Button Ripple Effect & Interaction ---- */
+/* ---- Buttons ---- */
 .btn-ripple {
   position: relative;
   overflow: hidden;
-  /* Penting: user-select none agar teks tidak ter-select saat klik */
   user-select: none;
   -webkit-user-select: none;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-              background-color 0.15s ease,
-              opacity 0.15s ease;
+  transition: transform         0.25s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow        0.25s cubic-bezier(0.22,1,0.36,1),
+              background-color  0.15s ease,
+              opacity           0.15s ease;
 }
-.btn-ripple:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-.btn-ripple:active:not(:disabled) {
-  transform: translateY(0) scale(0.97);
-  transition-duration: 0.08s;
-}
+.btn-ripple:hover:not(:disabled)   { transform: translateY(-2px); }
+.btn-ripple:active:not(:disabled)  { transform: translateY(0) scale(0.97); transition-duration: 0.08s; }
+.btn-ripple:disabled               { cursor: not-allowed; opacity: 0.55; }
 
-.btn-ripple:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
 .btn-ripple::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.28) 10%,
-    transparent 65%
-  );
+  background: radial-gradient(circle, rgba(255,255,255,0.28) 10%, transparent 65%);
   transform: scale(0);
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease;
   opacity: 0;
   border-radius: inherit;
   pointer-events: none;
@@ -275,7 +244,7 @@
   transition-duration: 0s;
 }
 
-/* ---- Sidebar styles ---- */
+/* ---- Sidebar ---- */
 .sidebar-nav-item {
   display: flex;
   align-items: center;
@@ -285,30 +254,28 @@
   color: var(--silver-primary);
   font-size: 14px;
   font-weight: 500;
-  transition: background-color 0.2s ease,
-              color 0.2s ease,
-              transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-              border-left-color 0.2s ease;
+  transition: background-color   0.2s ease,
+              color              0.2s ease,
+              transform          0.25s cubic-bezier(0.34,1.56,0.64,1),
+              border-left-color  0.2s ease;
   border-left: 3px solid transparent;
   text-decoration: none;
   user-select: none;
   -webkit-user-select: none;
 }
-
 .sidebar-nav-item:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255,255,255,0.07);
   color: var(--silver-bright);
   transform: translateX(3px);
 }
-
 .sidebar-nav-item.active {
-  background: rgba(74, 159, 212, 0.18);
+  background: rgba(74,159,212,0.18);
   color: #FFFFFF;
   border-left-color: var(--blue-accent);
   transform: translateX(3px);
 }
 
-/* ---- Badge styles ---- */
+/* ---- Badge ---- */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -328,7 +295,7 @@
   display: inline-block;
 }
 
-/* ---- Skeleton Loading ---- */
+/* ---- Skeleton ---- */
 .skeleton {
   border-radius: 8px;
   background: linear-gradient(
@@ -341,7 +308,7 @@
   animation: shimmer 2s ease-in-out infinite;
 }
 
-/* ---- Toast notification ---- */
+/* ---- Toast ---- */
 .toast-container {
   position: fixed;
   top: 20px;
@@ -352,28 +319,19 @@
   gap: 8px;
 }
 
-/* ---- Responsive ---- */
-@media (max-width: 768px) {
-  :root {
-    --sidebar-width: 0px;
-  }
-}
-
-/* ── INPUT FOCUS ── */
-/* Tambahkan ini untuk semua input/select/textarea */
-
+/* ---- Input transitions ---- */
 input, select, textarea {
   transition: border-color 0.2s ease,
-              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+              box-shadow   0.25s cubic-bezier(0.22,1,0.36,1);
+}
+input:focus, select:focus, textarea:focus { outline: none; }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  :root { --sidebar-width: 0px; }
 }
 
-/* Prevent layout shift saat focus — jangan animate padding */
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  /* Hanya box-shadow yang berubah, bukan ukuran element */
-}
-
-/* Reduced motion preference */
+/* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
