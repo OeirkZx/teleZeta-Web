@@ -666,12 +666,14 @@ export default function RegisterPage() {
 
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-600">
-          Sudah punya akun?{' '}
-          <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
-            Masuk di sini
-          </Link>
-        </p>
+        {!isSuccess && (
+          <p className="mt-8 text-center text-sm text-gray-600">
+            Sudah punya akun?{' '}
+            <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
+              Masuk di sini
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );
