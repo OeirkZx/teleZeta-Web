@@ -1,12 +1,13 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { MOCK_APPOINTMENTS, MOCK_DOCTORS, MOCK_MEDICAL_RECORDS, MOCK_PRESCRIPTIONS } from '@/lib/types';
+import { MOCK_APPOINTMENTS, MOCK_DOCTORS } from '@/lib/types';
+import type { Doctor, Profile } from '@/lib/types';
 import StatCard from '@/components/common/StatCard';
 import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { ArrowRight, Video, Calendar, ClipboardList, Pill, Clock } from 'lucide-react';
-import { formatTime, formatRupiah, isToday } from '@/lib/utils/formatters';
+import { formatTime, formatRupiah } from '@/lib/utils/formatters';
 
 async function getDashboardData() {
   const supabase = await createClient();
@@ -75,7 +76,7 @@ async function getDashboardData() {
         records: records || 0,
         prescriptions: prescriptions || 0,
       },
-      onlineDoctors: onlineDoctors || MOCK_DOCTORS.slice(0, 2),
+      onlineDoctors: onlineDoctors || [],
     };
 
   } catch (err) {
@@ -196,7 +197,7 @@ export default async function PatientDashboard() {
         </div>
         
         <div className="grid md:grid-cols-2 gap-4 lg:gap-6">
-          {onlineDoctors.map((doc, idx) => (
+          {onlineDoctors.map((doc: Doctor & { profiles?: Pick<Profile, 'full_name' | 'avatar_url'> }, idx: number) => (
             <div key={doc.id || idx} className="card card-clickable p-5 flex gap-4 transition-all">
               <Avatar
                 name={doc.profiles?.full_name || 'Dokter'}

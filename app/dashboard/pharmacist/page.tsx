@@ -50,8 +50,8 @@ export default function PharmacistDashboard() {
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
-        const new_orders = orders?.filter(o => o.status === 'processing').length || 0; // 'pending' changed to 'processing' by patient to send to pharmacy
-        const proc = orders?.filter(o => o.status === 'processing').length || 0; // combined
+        const new_orders = orders?.filter(o => o.status === 'pending').length || 0; // Orders not yet processed
+        const proc = orders?.filter(o => o.status === 'processing').length || 0;
         const ready = orders?.filter(o => o.status === 'ready').length || 0;
         
         const comp = orders?.filter(o => 
@@ -68,7 +68,8 @@ export default function PharmacistDashboard() {
       }
     }
     fetchData();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   if (loading) {
     return (

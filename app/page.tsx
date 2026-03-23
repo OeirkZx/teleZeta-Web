@@ -169,12 +169,12 @@ export default async function LandingPage() {
                 <div key={doctor.id} className="reveal-item card p-6">
                   <div className="flex items-start gap-4 mb-4">
                     <Avatar
-                      name={doctor.profiles.full_name}
-                      src={doctor.profiles.avatar_url}
+                      name={doctor.profiles?.full_name ?? 'Dokter'}
+                      src={doctor.profiles?.avatar_url}
                       size={64}
                     />
                     <div>
-                      <h3 className="font-bold text-lg text-gray-900 line-clamp-1">{doctor.profiles.full_name}</h3>
+                      <h3 className="font-bold text-lg text-gray-900 line-clamp-1">{doctor.profiles?.full_name ?? 'Dokter'}</h3>
                       <p className="text-sm font-medium text-blue-600 mb-2">{doctor.specialty}</p>
                       <Badge status={doctor.is_available ? 'online' : 'offline'} />
                     </div>

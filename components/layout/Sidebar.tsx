@@ -120,7 +120,7 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
               className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
               style={{
                 opacity: 0,
-                animation: `fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.055}s forwards`
+                animation: `fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.055}s forwards`,
               }}
               onClick={onMobileClose}
             >

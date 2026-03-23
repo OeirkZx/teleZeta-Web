@@ -338,4 +338,14 @@ input:focus, select:focus, textarea:focus { outline: none; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /* Ensure animated elements with opacity:0 start state are visible */
+  .sidebar-nav-item {
+    opacity: 1 !important;
+  }
+  .reveal-item {
+    opacity: 1 !important;
+  }
+  [class*="animate-"] {
+    opacity: 1 !important;
+  }
 }

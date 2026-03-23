@@ -1,6 +1,8 @@
 // [TeleZeta] Root Layout
 // Setup fonts, providers, dan metadata dasar
+import React from "react";
 import type { Metadata } from "next";
+import type { Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -8,6 +10,12 @@ export const metadata: Metadata = {
   description:
     "TeleZeta adalah platform telemedicine modern untuk konsultasi kesehatan online. Hubungi dokter terpercaya melalui video call dan chat secara real-time.",
   keywords: ["telemedicine", "konsultasi dokter", "kesehatan online", "TeleZeta"],
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({

@@ -236,7 +236,7 @@ function LoginForm() {
                 id="password"
                 type="password"
                 placeholder="Masukkan password Anda"
-                autoComplete="new-password"
+                autoComplete="current-password"
                 defaultValue=""
                 className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
                   errors.password ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'

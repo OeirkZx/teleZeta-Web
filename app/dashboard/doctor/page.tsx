@@ -86,7 +86,8 @@ export default function DoctorDashboard() {
       }
     }
     fetchData();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const toggleAvailability = async () => {
     if (!user || !doctorData || updatingStatus) return;
@@ -326,7 +327,7 @@ export default function DoctorDashboard() {
                         Mulai
                       </button>
                     ) : (
-                      <span className="text-sm font-medium text-gray-400">Telesai</span>
+                      <span className="text-sm font-medium text-gray-400">Selesai</span>
                     )}
                   </div>
                 </div>

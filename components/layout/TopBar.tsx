@@ -33,7 +33,7 @@ export default function TopBar({ userId, profile, onMenuClick }: TopBarProps) {
       return () => clearTimeout(timer);
     }
     setPrevUnread(unreadCount);
-  }, [unreadCount, prevUnread]);
+  }, [unreadCount]); // intentionally exclude prevUnread to avoid loop
 
   // Close dropdown on outside click
   useEffect(() => {

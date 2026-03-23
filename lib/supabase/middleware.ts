@@ -20,11 +20,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.next({ request })
   }
 
-  const hasCookies = request.cookies.getAll().length > 0
-  if (!hasCookies) {
-    return NextResponse.next({ request })
-  }
-
   let supabaseResponse = NextResponse.next({
     request,
   })
