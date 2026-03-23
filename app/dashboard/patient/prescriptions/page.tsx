@@ -9,7 +9,7 @@ import type { Prescription } from '@/lib/types';
 import { formatTime } from '@/lib/utils/formatters';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import Badge from '@/components/common/Badge';
-import { Pill, Search, Store, Clock, ArrowRight, User, Package, CheckCircle2 } from 'lucide-react';
+import { Pill, Search, Store, Clock, ArrowRight, User, Package, CheckCircle2, AlertCircle } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 
 // Helper type for joined query
@@ -25,6 +25,7 @@ export default function PatientPrescriptions() {
   const [prescriptions, setPrescriptions] = useState<EnrichedPrescription[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedPrescription, setSelectedPrescription] = useState<EnrichedPrescription | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -46,7 +47,8 @@ export default function PatientPrescriptions() {
         setPrescriptions(data as any[]);
       } catch (err) {
         console.error('[TeleZeta] Failed to fetch prescriptions:', err);
-        setPrescriptions(MOCK_PRESCRIPTIONS as any[]);
+        setPrescriptions([]);
+        setErrorMsg('Gagal memuat resep. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);
       }
@@ -104,6 +106,13 @@ export default function PatientPrescriptions() {
           />
         </div>
       </div>
+
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl flex items-center gap-3 animate-fadeUp">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{errorMsg}</p>
+        </div>
+      )}
 
       {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

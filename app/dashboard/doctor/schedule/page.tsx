@@ -216,7 +216,7 @@ export default function DoctorSchedule() {
               {pendingApps.length > 0 ? (
                 <div className="space-y-4">
                   {pendingApps.map((app, i) => (
-                    <div key={app.id} style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'forwards' }} className="animate-fadeUp opacity-0">
+                    <div key={app.id} style={{ animationDelay: `${i * 100}ms` }} className="animate-fadeUp">
                       <AppointmentCard app={app} />
                     </div>
                   ))}
@@ -236,7 +236,7 @@ export default function DoctorSchedule() {
               {upcomingApps.length > 0 ? (
                 <div className="space-y-4">
                   {upcomingApps.map((app, i) => (
-                    <div key={app.id} style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'forwards' }} className="animate-fadeUp opacity-0">
+                    <div key={app.id} style={{ animationDelay: `${i * 100}ms` }} className="animate-fadeUp">
                       <AppointmentCard app={app} />
                     </div>
                   ))}
@@ -255,7 +255,7 @@ export default function DoctorSchedule() {
             <Tabs.Content value="past" className="outline-none">
               <div className="space-y-4 opacity-75">
                 {pastApps.slice(0, 10).map((app, i) => ( // only show recent 10
-                  <div key={app.id} style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'forwards' }} className="animate-fadeUp opacity-0">
+                  <div key={app.id} style={{ animationDelay: `${i * 50}ms` }} className="animate-fadeUp">
                     <AppointmentCard app={app} />
                   </div>
                 ))}

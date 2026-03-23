@@ -11,7 +11,7 @@ import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { formatTimeWIB } from '@/lib/utils/formatters';
-import { Calendar, Clock, Video, MessageSquare, ArrowRight, XCircle, FileText, Share2, Star } from 'lucide-react';
+import { Calendar, Clock, Video, MessageSquare, ArrowRight, XCircle, FileText, Share2, Star, AlertCircle } from 'lucide-react';
 import * as Tabs from '@radix-ui/react-tabs';
 
 type AppointmentWithDoctor = Appointment & { 
@@ -25,6 +25,7 @@ export default function PatientAppointments() {
   const [appointments, setAppointments] = useState<AppointmentWithDoctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Review states
   const [reviewTargetId, setReviewTargetId] = useState<string | null>(null);
@@ -48,8 +49,8 @@ export default function PatientAppointments() {
         
       } catch (err) {
         console.error('[TeleZeta] Failed to fetch appointments:', err);
-        // Use Mock data for UI preview if failed
-        setAppointments(MOCK_APPOINTMENTS as unknown as AppointmentWithDoctor[]);
+        setAppointments([]);
+        setErrorMsg('Gagal memuat jadwal. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);
       }
@@ -223,6 +224,13 @@ export default function PatientAppointments() {
         <p className="text-gray-600 mt-2">Kelola jadwal konsultasi Anda dengan dokter</p>
       </div>
 
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl flex items-center gap-3 mb-6 animate-fadeUp">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{errorMsg}</p>
+        </div>
+      )}
+
       <Tabs.Root defaultValue="upcoming" className="animate-fadeUp d1">
         <Tabs.List className="flex gap-2 p-1 bg-gray-100 rounded-xl w-full md:w-max mb-6">
           <Tabs.Trigger
@@ -247,7 +255,7 @@ export default function PatientAppointments() {
           ) : upcomingApps.length > 0 ? (
             <div className="space-y-4">
               {upcomingApps.map((app, i) => (
-                <div key={app.id} style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'forwards' }} className="animate-fadeUp opacity-0">
+                <div key={app.id} style={{ animationDelay: `${i * 100}ms` }} className="animate-fadeUp">
                   <AppointmentCard app={app} />
                 </div>
               ))}
@@ -278,7 +286,7 @@ export default function PatientAppointments() {
           ) : pastApps.length > 0 ? (
             <div className="space-y-4">
               {pastApps.map((app, i) => (
-                <div key={app.id} style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'forwards' }} className="animate-fadeUp opacity-0">
+                <div key={app.id} style={{ animationDelay: `${i * 100}ms` }} className="animate-fadeUp">
                   <AppointmentCard app={app} />
                 </div>
               ))}

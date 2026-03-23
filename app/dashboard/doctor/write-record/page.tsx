@@ -244,7 +244,7 @@ export default function WriteRecord() {
       )}
 
       {appointment && !errorMsg ? (
-        <div className="space-y-6 animate-slideRight opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '100ms' }}>
+        <div className="space-y-6 animate-slideRight" style={{ animationDelay: '100ms' }}>
           
           {/* Patient Overview Card */}
           <div className="card p-6 bg-gradient-to-r from-blue-50 to-white border-blue-100">
