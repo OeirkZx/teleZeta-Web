@@ -78,9 +78,10 @@ function WriteRecordContent() {
         } else if (patientId) {
           query = query.eq('patient_id', patientId).order('scheduled_at', { ascending: false }).limit(1);
         } else {
-          // Find the most recent ongoing or completed without a record
-          // For simplicity, just get the most recent one overall
-          query = query.order('scheduled_at', { ascending: false }).limit(1);
+          // Jangan pilih otomatis, minta dokter memilih dari jadwal
+          setAppointment(null);
+          setLoading(false);
+          return;
         }
 
         const { data, error } = await query.single();
