@@ -11,7 +11,7 @@ import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { MOCK_APPOINTMENTS } from '@/lib/types';
-import { formatTime } from '@/lib/utils/formatters';
+import { formatTimeWIB } from '@/lib/utils/formatters';
 import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings, MessageSquare, Power, AlertCircle } from 'lucide-react';
 
 export default function DoctorDashboard() {
@@ -191,7 +191,7 @@ export default function DoctorDashboard() {
                 <p className="text-green-100 text-sm font-medium mb-1 uppercase tracking-wide">Konsultasi Berikutnya</p>
                 <h3 className="text-2xl font-bold mb-1">{nextAppointment.patient?.full_name}</h3>
                 <div className="flex items-center gap-3 text-sm font-medium text-white/90">
-                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {formatTime(nextAppointment.scheduled_at)} WIB</span>
+                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {formatTimeWIB(nextAppointment.scheduled_at)} WIB</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
                   <span className="flex items-center gap-1.5">
                     {nextAppointment.consultation_type === 'video' ? <Video className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
@@ -283,7 +283,7 @@ export default function DoctorDashboard() {
                   <div className="flex items-center gap-4">
                     <div className="text-center w-16 shrink-0 border-r border-gray-100 pr-4">
                       <p className="text-xs text-gray-500 font-semibold uppercase">Pukul</p>
-                      <p className="text-lg font-bold text-gray-900">{formatTime(app.scheduled_at)}</p>
+                      <p className="text-lg font-bold text-gray-900">{formatTimeWIB(app.scheduled_at)}</p>
                     </div>
                     <Avatar
                       name={app.patient?.full_name}

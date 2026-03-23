@@ -10,7 +10,7 @@ import type { Appointment, Doctor, Profile } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { formatTime } from '@/lib/utils/formatters';
+import { formatTimeWIB } from '@/lib/utils/formatters';
 import { Calendar, Clock, Video, MessageSquare, ArrowRight, XCircle, FileText, Share2, Star } from 'lucide-react';
 import * as Tabs from '@radix-ui/react-tabs';
 
@@ -144,7 +144,7 @@ export default function PatientAppointments() {
               <p className="font-bold text-gray-900">{date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
               <div className="flex items-center gap-1.5 text-blue-600 font-medium mt-1">
                 <Clock className="w-4 h-4" />
-                {formatTime(app.scheduled_at)} WIB
+                {formatTimeWIB(app.scheduled_at)} WIB
               </div>
             </div>
             
@@ -180,7 +180,7 @@ export default function PatientAppointments() {
                 className="w-full md:w-auto px-6 py-2.5 rounded-xl font-bold text-white shadow-sm flex items-center justify-center transition-transform hover:-translate-y-0.5 btn-ripple text-sm"
                 style={{ background: 'var(--blue-accent)' }}
               >
-                Mulai {app.consultation_type === 'video' ? 'Video' : 'Chat'} <ArrowRight className="ml-2 w-4 h-4" />
+                {app.status === 'ongoing' ? 'Lanjutkan' : 'Mulai'} {app.consultation_type === 'video' ? 'Video' : 'Chat'} <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             )}
             

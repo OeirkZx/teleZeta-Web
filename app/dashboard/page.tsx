@@ -15,6 +15,8 @@ export default function DashboardPage() {
     if (!loading && role) {
       console.log('[TeleZeta] Redirecting to dashboard:', role);
       router.replace(`/dashboard/${role}`);
+    } else if (!loading && !role) {
+      router.replace('/login?message=Profil tidak ditemukan, silakan daftar ulang');
     }
   }, [role, loading, router]);
 

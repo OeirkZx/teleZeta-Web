@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client';
 import { loginSchema, type LoginFormData } from '@/lib/utils/validators';
 import TeleZetaLogo from '@/components/common/TeleZetaLogo';
 import { Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
 function LoginForm() {
   const router = useRouter();
@@ -28,6 +28,13 @@ function LoginForm() {
   const [resetMessage, setResetMessage] = useState<string | null>(null);
 
   const supabase = createClient();
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const {
     register,

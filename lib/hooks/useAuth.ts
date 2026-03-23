@@ -2,7 +2,7 @@
 // Hook untuk mengelola state autentikasi user
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile, UserRole } from '@/lib/types';
 import type { User } from '@supabase/supabase-js';
@@ -24,7 +24,7 @@ export function useAuth() {
     error: null,
   });
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {

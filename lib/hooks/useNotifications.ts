@@ -2,7 +2,7 @@
 // Subscribe ke tabel notifications untuk notifikasi realtime
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Notification } from '@/lib/types';
 
@@ -10,7 +10,7 @@ export function useNotifications(userId: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch existing notifications
   useEffect(() => {

@@ -42,7 +42,7 @@ export default function PharmacistDashboard() {
         const { data: orders } = await supabase
           .from('prescriptions')
           .select('*, patient:profiles!patient_id(full_name), doctor:doctors(profiles(full_name)), prescription_items(*)')
-          .eq('pharmacist_id', user.id)
+          .or(`pharmacist_id.eq.${user.id},and(pharmacist_id.is.null,status.eq.processing)`)
           .order('updated_at', { ascending: false });
 
         setRecentOrders(orders || []);
@@ -55,7 +55,7 @@ export default function PharmacistDashboard() {
         const ready = orders?.filter(o => o.status === 'ready').length || 0;
         
         const comp = orders?.filter(o => 
-          o.status === 'completed' && new Date(o.updated_at) >= todayStart
+          o.status === 'dispensed' && new Date(o.updated_at) >= todayStart
         ).length || 0;
 
         setStats({ new: new_orders, processing: proc, ready, completed_today: comp });

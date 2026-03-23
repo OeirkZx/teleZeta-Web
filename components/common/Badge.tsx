@@ -33,6 +33,12 @@ const BADGE_CONFIG: Record<string, { bg: string; text: string; dot: string; labe
   // Consultation type
   video: { bg: '#DBEAFE', text: '#1E40AF', dot: '#3B82F6', label: 'Video Call' },
   chat: { bg: '#E0E7FF', text: '#3730A3', dot: '#6366F1', label: 'Chat' },
+
+  // User & Inventory status
+  active: { bg: '#DCFCE7', text: '#166534', dot: '#22C55E', label: 'Aktif' },
+  inactive: { bg: '#FEE2E2', text: '#991B1B', dot: '#EF4444', label: 'Nonaktif' },
+  low_stock: { bg: '#FEF3C7', text: '#92400E', dot: '#F59E0B', label: 'Stok Menipis' },
+  out_of_stock: { bg: '#FEE2E2', text: '#991B1B', dot: '#EF4444', label: 'Stok Habis' },
 };
 
 export default function Badge({ status, className = '' }: BadgeProps) {

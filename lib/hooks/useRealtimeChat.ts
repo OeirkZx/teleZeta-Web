@@ -2,14 +2,14 @@
 // Subscribe ke tabel messages untuk chat realtime
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Message } from '@/lib/types';
 
 export function useRealtimeChat(appointmentId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch existing messages
   useEffect(() => {

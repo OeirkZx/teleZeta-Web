@@ -165,19 +165,24 @@ export default function DoctorStats() {
             </div>
 
             {monthlyChart.map((item, idx) => {
-              const heightPercent = Math.max((item.count / maxChartValue) * 100, 5); // min 5% height for visibility null counts
+              const height = (item.count / maxChartValue) * 100;
               return (
-                <div key={idx} className="flex-1 flex flex-col justify-end items-center group relative z-10 h-full pb-8">
+                <div key={idx} className="flex flex-col items-center justify-end gap-1 flex-1 group relative z-10 h-full pb-8">
                   {/* Tooltip */}
-                  <div className="absolute -top-10 opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-xs py-1 px-2 rounded transition-opacity whitespace-nowrap z-20 pointer-events-none">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-8 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
                     {item.count} konsultasi
                   </div>
+                  {/* Label angka */}
+                  <span className="text-xs font-bold text-gray-700">{item.count}</span>
                   {/* Bar */}
                   <div 
-                    className="w-full max-w-[48px] rounded-t-lg bg-blue-100 transition-all duration-1000 group-hover:bg-blue-300 relative overflow-hidden"
-                    style={{ height: `${heightPercent}%` }}
+                    className="w-full max-w-[48px] rounded-t-lg transition-all duration-500 relative"
+                    style={{ 
+                      height: `${Math.max(height, 5)}%`,
+                      background: 'var(--blue-accent)',
+                      opacity: item.count > 0 ? 1 : 0.3
+                    }}
                   >
-                    <div className="absolute bottom-0 w-full bg-blue-500 opacity-90 transition-all duration-1000" style={{ height: '80%' }}></div>
                   </div>
                   {/* Label */}
                   <div className="absolute bottom-0 text-xs font-semibold text-gray-500 uppercase tracking-wider">

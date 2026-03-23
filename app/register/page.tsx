@@ -61,7 +61,7 @@ export default function RegisterPage() {
   const handleNext = async (currentStepData: any) => {
     setFormData((prev: any) => ({ ...prev, ...currentStepData }));
     setStep(prev => prev + 1);
-    reset({});
+    setTimeout(() => reset({}), 50);
   };
 
   const handleBack = () => {

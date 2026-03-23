@@ -10,7 +10,7 @@ import type { Appointment, Profile } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { formatTime } from '@/lib/utils/formatters';
+import { formatTimeWIB } from '@/lib/utils/formatters';
 import { Calendar, Clock, Video, MessageSquare, ArrowRight, Check, X } from 'lucide-react';
 import * as Tabs from '@radix-ui/react-tabs';
 
@@ -19,7 +19,7 @@ type AppointmentWithPatient = Appointment & {
 };
 
 export default function DoctorSchedule() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const router = useRouter();
   const supabase = createClient();
   
@@ -63,6 +63,22 @@ export default function DoctorSchedule() {
       setAppointments(prev => prev.map(app => 
         app.id === id ? { ...app, status: newStatus } : app
       ));
+
+      // Ambil data appointment yang baru diupdate
+      const updatedApp = appointments.find(a => a.id === id);
+      if (updatedApp) {
+        await supabase.from('notifications').insert({
+          user_id: updatedApp.patient_id,
+          title: newStatus === 'confirmed' 
+            ? '✅ Janji Temu Dikonfirmasi' 
+            : '❌ Janji Temu Ditolak',
+          body: newStatus === 'confirmed'
+            ? `Dr. ${profile?.full_name || 'Dokter'} telah mengkonfirmasi jadwal konsultasi Anda. Sampai jumpa!`
+            : `Maaf, Dr. ${profile?.full_name || 'Dokter'} tidak dapat menerima jadwal konsultasi Anda. Silakan pilih jadwal lain.`,
+          type: 'appointment',
+          is_read: false,
+        });
+      }
     } catch (err) {
       console.error('[TeleZeta] Failed to update appointment:', err);
       alert('Gagal memperbarui status. Silakan coba lagi.');
@@ -90,7 +106,7 @@ export default function DoctorSchedule() {
               <p className="font-bold text-gray-900">{date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
               <div className="flex items-center gap-1.5 text-blue-600 font-medium mt-1">
                 <Clock className="w-4 h-4" />
-                {formatTime(app.scheduled_at)} WIB
+                {formatTimeWIB(app.scheduled_at)} WIB
               </div>
             </div>
             <Badge status={app.status as any} />

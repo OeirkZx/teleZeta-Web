@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { Store, Mail, Phone, Loader2, CheckCircle2, MapPin, FileCheck, Building } from 'lucide-react';
 
 const profileSchema = z.object({
-  phone: z.string().min(10, "Nomor telepon minimal 10 digit"),
+  phone: z.string().min(10, "Nomor telepon minimal 10 digit").optional().or(z.literal('')),
   
   // Pharmacist specific
   pharmacy_name: z.string().min(3, "Nama Apotek wajib diisi"),

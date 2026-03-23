@@ -234,12 +234,12 @@ export default function PatientPrescriptions() {
                       </li>
                       <li className="flex items-start gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                          ['processing', 'ready', 'completed'].includes(selectedPrescription.status) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'
+                          ['processing', 'ready', 'dispensed'].includes(selectedPrescription.status) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'
                         }`}>
                           <Package className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className={`font-bold text-sm ${['processing', 'ready', 'completed'].includes(selectedPrescription.status) ? 'text-gray-900' : 'text-gray-400'}`}>Sedang Disiapkan</p>
+                          <p className={`font-bold text-sm ${['processing', 'ready', 'dispensed'].includes(selectedPrescription.status) ? 'text-gray-900' : 'text-gray-400'}`}>Sedang Disiapkan</p>
                           <p className="text-xs text-gray-500">Apoteker sedang meracik dan menyiapkan obat Anda.</p>
                           {selectedPrescription.status === 'processing' && (
                             <p className="text-xs font-semibold text-orange-500 mt-1 flex items-center gap-1"><Clock className="w-3 h-3" /> Sedang berlangsung</p>
@@ -248,12 +248,12 @@ export default function PatientPrescriptions() {
                       </li>
                       <li className="flex items-start gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                          ['ready', 'completed'].includes(selectedPrescription.status) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'
+                          ['ready', 'dispensed'].includes(selectedPrescription.status) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'
                         }`}>
                           <Store className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className={`font-bold text-sm ${['ready', 'completed'].includes(selectedPrescription.status) ? 'text-gray-900' : 'text-gray-400'}`}>Obat Siap</p>
+                          <p className={`font-bold text-sm ${['ready', 'dispensed'].includes(selectedPrescription.status) ? 'text-gray-900' : 'text-gray-400'}`}>Obat Siap</p>
                           <p className="text-xs text-gray-500">Obat sudah siap untuk diambil / dikirim.</p>
                           {selectedPrescription.status === 'ready' && (
                             <p className="text-xs font-semibold text-green-500 mt-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Silakan menuju apotek yang ditunjuk</p>

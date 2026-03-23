@@ -9,7 +9,7 @@ import { useRealtimeChat } from '@/lib/hooks/useRealtimeChat';
 import type { Appointment, ChatMessage } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import { PageSkeleton } from '@/components/common/LoadingSkeleton';
-import { formatTime } from '@/lib/utils/formatters';
+import { formatTimeWIB } from '@/lib/utils/formatters';
 import { PhoneOff, Video as VideoIcon, Mic, MicOff, VideoOff, MessageSquare, Send, X, AlertCircle } from 'lucide-react';
 import DailyIframe, { DailyCall } from '@daily-co/daily-js';
 
@@ -60,6 +60,10 @@ export default function ConsultationRoom({
 
         if (error) throw error;
         
+        if (!data || !data.patient || !data.doctor) {
+          throw new Error('Data konsultasi, dokter, atau pasien tidak ditemukan.');
+        }
+
         // Basic Security Check
         if (data.patient_id !== user.id && data.doctor_id !== user.id) {
           throw new Error('Anda tidak memiliki akses ke ruang konsultasi ini.');
@@ -292,7 +296,7 @@ export default function ConsultationRoom({
                     }`}>
                       <p className="text-sm md:text-base leading-relaxed break-words">{msg.content}</p>
                       <p className={`text-[10px] mt-1.5 font-medium ${isMe ? 'text-blue-200 text-right' : 'text-gray-400 text-left'}`}>
-                        {formatTime(msg.created_at)}
+                        {formatTimeWIB(msg.created_at)}
                       </p>
                     </div>
                   </div>

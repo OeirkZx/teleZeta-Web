@@ -41,7 +41,21 @@ export function formatDateShort(dateString: string): string {
 }
 
 /**
- * Format waktu saja
+ * Format waktu saja (WIB)
+ * Contoh: "2024-01-15T09:30:00" → "09:30"
+ */
+export function formatTimeWIB(dateString: string): string {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
+/**
+ * Format waktu saja (Legacy)
  * Contoh: "2024-01-15T09:30:00" → "09:30"
  */
 export function formatTime(dateString: string): string {

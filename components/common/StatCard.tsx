@@ -3,6 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/common/LoadingSkeleton';
 
 interface StatCardProps {
   emoji: string;
@@ -68,6 +69,11 @@ export default function StatCard({ emoji, label, value, delay = 0, trend }: Stat
 
     return () => cancelAnimationFrame(animationFrame);
   }, [value]);
+
+  if (value === undefined || value === null) {
+    return <Skeleton height={140} borderRadius={24} />;
+  }
+
   return (
     <div
       className="card animate-fadeUp"

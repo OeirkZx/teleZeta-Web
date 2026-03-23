@@ -133,7 +133,6 @@ export default function WriteRecord() {
         const { data: prescriptionData, error: presError } = await supabase
           .from('prescriptions')
           .insert({
-            appointment_id: appointment.id,
             medical_record_id: recordData.id,
             patient_id: appointment.patient_id,
             doctor_id: user.id,
