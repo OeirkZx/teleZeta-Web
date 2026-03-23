@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { formatDate, formatTime, formatDateShort } from '@/lib/utils/formatters';
+import { formatDate, formatTime, formatDateShort } from '@/lib/utils/formatters';import { log, logError } from '@/lib/utils/logger';
+
 import {
   History, Search, Pill, User, Calendar, TrendingUp,
   ChevronDown, ChevronUp, Package
@@ -51,7 +52,7 @@ export default function PharmacistHistory() {
         if (error) throw error;
         setPrescriptions(data || []);
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch history:', err);
+        logError('[TeleZeta] Failed to fetch history:', err);
       } finally {
         setLoading(false);
       }
@@ -65,7 +66,7 @@ export default function PharmacistHistory() {
     return (
       p.id.toLowerCase().includes(q) ||
       p.patient?.full_name?.toLowerCase().includes(q) ||
-      p.prescription_items?.some((item: any) =>
+      p.prescription_items?.some((item: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
         item.medicine_name.toLowerCase().includes(q)
       )
     );
@@ -171,7 +172,7 @@ export default function PharmacistHistory() {
               </div>
 
               <div className="space-y-3">
-                {items.map((prescription: any) => (
+                {items.map((prescription: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                   <div
                     key={prescription.id}
                     className="card bg-white border border-gray-100 overflow-hidden transition-all hover:shadow-md"
@@ -224,7 +225,7 @@ export default function PharmacistHistory() {
                           <Pill className="w-4 h-4 text-orange-500" /> Daftar Obat
                         </h4>
                         <div className="grid md:grid-cols-2 gap-3">
-                          {prescription.prescription_items?.map((item: any) => (
+                          {prescription.prescription_items?.map((item: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                             <div key={item.id} className="bg-white p-3 rounded-lg border border-gray-200">
                               <p className="font-bold text-gray-900 text-sm">{item.medicine_name}</p>
                               <div className="flex flex-wrap gap-2 mt-2">

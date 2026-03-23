@@ -12,7 +12,8 @@ import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { MOCK_APPOINTMENTS } from '@/lib/types';
 import { formatTimeWIB } from '@/lib/utils/formatters';
-import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings, MessageSquare, Power, AlertCircle } from 'lucide-react';
+import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings, MessageSquare, Power, AlertCircle } from 'lucide-react';import { log, logError } from '@/lib/utils/logger';
+
 
 export default function DoctorDashboard() {
   const { user, profile } = useAuth();
@@ -79,7 +80,7 @@ export default function DoctorDashboard() {
         });
 
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch doctor dashboard:', err);
+        logError('[TeleZeta] Failed to fetch doctor dashboard:', err);
         setErrorMsg('Gagal memuat data dashboard. Silakan coba lagi nanti.');
       } finally {
         setLoading(false);
@@ -103,7 +104,7 @@ export default function DoctorDashboard() {
       if (error) throw error;
       setDoctorData({ ...doctorData, is_available: newStatus });
     } catch (err) {
-      console.error('[TeleZeta] Failed to update availability:', err);
+      logError('[TeleZeta] Failed to update availability:', err);
       alert('Gagal memperbarui status ketersediaan.');
     } finally {
       setUpdatingStatus(false);
@@ -213,7 +214,7 @@ export default function DoctorDashboard() {
                 onClick={() => {
                   const appointmentId = nextAppointment?.id;
                   if (!appointmentId) {
-                    console.error('[TeleZeta] nextAppointment.id is undefined:', nextAppointment);
+                    logError('[TeleZeta] nextAppointment.id is undefined:', nextAppointment);
                     return;
                   }
                   router.push(`/consultation/${appointmentId}`);
@@ -317,7 +318,7 @@ export default function DoctorDashboard() {
                         onClick={() => {
                           const appointmentId = app?.id;
                           if (!appointmentId) {
-                            console.error('[TeleZeta] app.id is undefined:', app);
+                            logError('[TeleZeta] app.id is undefined:', app);
                             return;
                           }
                           router.push(`/consultation/${appointmentId}`);

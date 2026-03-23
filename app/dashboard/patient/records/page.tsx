@@ -10,7 +10,8 @@ import type { MedicalRecord } from '@/lib/types';
 import { formatTime } from '@/lib/utils/formatters';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { FileText, Calendar, Activity, Syringe, HeartPulse, Search, User, AlertCircle } from 'lucide-react';
-import * as Dialog from '@radix-ui/react-dialog';
+import * as Dialog from '@radix-ui/react-dialog';import { log, logError } from '@/lib/utils/logger';
+
 
 // Helper type for joined query
 type EnrichedRecord = MedicalRecord & {
@@ -63,7 +64,7 @@ export default function PatientRecords() {
           if (found) setSelectedRecord(found as any);
         }
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch medical records:', err);
+        logError('[TeleZeta] Failed to fetch medical records:', err);
         setErrorMsg('Gagal memuat riwayat rekam medis. Silakan coba lagi.');
       } finally {
         setLoading(false);

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect } from 'react';import { log, logError } from '@/lib/utils/logger';
+
 
 export default function DashboardError({
   error,
@@ -11,7 +12,7 @@ export default function DashboardError({
 }) {
   useEffect(() => {
     // Optionally log the error to an error reporting service
-    console.error('[TeleZeta] Dashboard runtime error:', error);
+    logError('[TeleZeta] Dashboard runtime error:', error);
   }, [error]);
 
   return (

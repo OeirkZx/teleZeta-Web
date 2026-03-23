@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { formatTime, formatRelativeTime } from '@/lib/utils/formatters';
+import { formatTime, formatRelativeTime } from '@/lib/utils/formatters';import { log, logError } from '@/lib/utils/logger';
+
 import {
   ClipboardList, Search, CheckCircle2, Clock, AlertCircle,
   Pill, User, ArrowRight, Loader2, Filter
@@ -26,7 +27,7 @@ export default function PharmacistQueue() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    let subscription: any = null;
+    let subscription: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     async function fetchQueue() {
       if (!user) return;
@@ -46,7 +47,7 @@ export default function PharmacistQueue() {
         if (error) throw error;
         setPrescriptions(data || []);
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch queue:', err);
+        logError('[TeleZeta] Failed to fetch queue:', err);
         setErrorMsg('Gagal memuat daftar antrian. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);
@@ -79,7 +80,7 @@ export default function PharmacistQueue() {
     if (!user) return;
     setUpdatingId(id);
     try {
-      const updateData: any = {
+      const updateData: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
         status: newStatus,
         updated_at: new Date().toISOString(),
       };
@@ -104,7 +105,7 @@ export default function PharmacistQueue() {
         );
       }
     } catch (err) {
-      console.error('[TeleZeta] Failed to update status:', err);
+      logError('[TeleZeta] Failed to update status:', err);
       alert('Gagal memperbarui status resep.');
     } finally {
       setUpdatingId(null);
@@ -307,7 +308,7 @@ export default function PharmacistQueue() {
               {prescription.prescription_items && prescription.prescription_items.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <div className="flex flex-wrap gap-2">
-                    {prescription.prescription_items.slice(0, 4).map((item: any) => (
+                    {prescription.prescription_items.slice(0, 4).map((item: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                       <span
                         key={item.id}
                         className="inline-flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg text-xs font-semibold border border-orange-100"

@@ -1,7 +1,7 @@
 // [TeleZeta] Consultation Room (Video Call / Chat)
 'use client';
 
-import { useState, useEffect, useRef, use } from 'react';
+import { useState, useEffect, useRef, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -11,7 +11,8 @@ import Avatar from '@/components/common/Avatar';
 import { PageSkeleton } from '@/components/common/LoadingSkeleton';
 import { formatTimeWIB } from '@/lib/utils/formatters';
 import { PhoneOff, Video as VideoIcon, Mic, MicOff, VideoOff, MessageSquare, Send, X, AlertCircle } from 'lucide-react';
-import DailyIframe, { DailyCall } from '@daily-co/daily-js';
+import DailyIframe, { DailyCall } from '@daily-co/daily-js';import { log, logError } from '@/lib/utils/logger';
+
 
 // Setup Daily.co room URL dynamically or use environment variable
 // For production, you should create rooms via API. For this demo, we'll use a static room or one from env.
@@ -25,7 +26,7 @@ export default function ConsultationRoom({
   const { id } = use(params);
   const router = useRouter();
   const { user, profile: currentUserProfile, role } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   
   const [appointment, setAppointment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,7 @@ export default function ConsultationRoom({
   
   // Video Call State
   const videoContainerRef = useRef<HTMLDivElement>(null);
-  const [callObject, setCallObject] = useState<DailyCall | null>(null);
+  const callRef = useRef<DailyCall | null>(null);
   const [isJoined, setIsJoined] = useState(false);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
@@ -79,8 +80,8 @@ export default function ConsultationRoom({
             .eq('id', id);
         }
 
-      } catch (err: any) {
-        console.error('[TeleZeta] Room Error:', err);
+      } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
+        logError('[TeleZeta] Room Error:', err);
         setError(err.message || 'Gagal memuat detail konsultasi.');
       } finally {
         setLoading(false);
@@ -91,7 +92,7 @@ export default function ConsultationRoom({
 
   // Setup Daily.co
   useEffect(() => {
-    if (!appointment || appointment.consultation_type !== 'video' || !videoContainerRef.current || callObject) return;
+    if (!appointment || appointment.consultation_type !== 'video' || !videoContainerRef.current || callRef.current) return;
 
     const initCall = async () => {
       const co = DailyIframe.createFrame(videoContainerRef.current!, {
@@ -105,27 +106,30 @@ export default function ConsultationRoom({
         },
       });
 
-      setCallObject(co);
+      callRef.current = co;
 
       try {
+        const roomUrl = appointment.daily_room_url || DAILY_ROOM_URL;
         await co.join({ 
-          url: DAILY_ROOM_URL,
+          url: roomUrl,
           userName: currentUserProfile?.full_name || 'User',
         });
         setIsJoined(true);
       } catch (e) {
-        console.error('[TeleZeta] Failed to join Daily call:', e);
+        logError('[TeleZeta] Failed to join Daily call:', e);
       }
     };
 
     initCall();
 
     return () => {
-      if (callObject) {
-        (callObject as any).leave().then(() => (callObject as any).destroy());
+      if (callRef.current) {
+        callRef.current.leave()
+          .then(() => callRef.current?.destroy())
+          .catch(console.error);
       }
     };
-  }, [appointment, currentUserProfile, callObject]);
+  }, [appointment, currentUserProfile]);
 
   // Auto scroll chat
   useEffect(() => {
@@ -136,8 +140,8 @@ export default function ConsultationRoom({
     if (!confirm('Akhiri konsultasi sekarang?')) return;
     
     try {
-      if (callObject) {
-        await (callObject as any).leave();
+      if (callRef.current) {
+        await callRef.current.leave();
       }
 
       await supabase
@@ -153,7 +157,7 @@ export default function ConsultationRoom({
         router.push('/dashboard/patient/appointments');
       }
     } catch (err) {
-      console.error('[TeleZeta] Failed to end consultation:', err);
+      logError('[TeleZeta] Failed to end consultation:', err);
       // Fallback redirect anyway
       router.push(`/dashboard/${role}`);
     }
@@ -168,15 +172,15 @@ export default function ConsultationRoom({
   };
 
   const toggleMic = () => {
-    if (callObject) {
-      callObject.setLocalAudio(!micOn);
+    if (callRef.current) {
+      callRef.current.setLocalAudio(!micOn);
       setMicOn(!micOn);
     }
   };
 
   const toggleCam = () => {
-    if (callObject) {
-      callObject.setLocalVideo(!camOn);
+    if (callRef.current) {
+      callRef.current.setLocalVideo(!camOn);
       setCamOn(!camOn);
     }
   };
@@ -226,6 +230,7 @@ export default function ConsultationRoom({
 
         <button
           onClick={handleEndConsultation}
+          aria-label="Akhiri konsultasi"
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:bg-red-700 active:scale-95"
           style={{ background: 'var(--danger)' }}
         >
@@ -248,6 +253,7 @@ export default function ConsultationRoom({
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-gray-900/80 backdrop-blur-md px-6 py-3 rounded-full border border-gray-700 z-10 animate-slideUp">
               <button 
                 onClick={toggleMic}
+                aria-label={micOn ? "Matikan mikrofon" : "Nyalakan mikrofon"}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   micOn ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-red-500 text-white hover:bg-red-600'
                 }`}
@@ -257,6 +263,7 @@ export default function ConsultationRoom({
               
               <button 
                 onClick={toggleCam}
+                aria-label={camOn ? "Matikan kamera" : "Nyalakan kamera"}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   camOn ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-red-500 text-white hover:bg-red-600'
                 }`}

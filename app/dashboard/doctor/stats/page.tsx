@@ -7,7 +7,8 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import StatCard from '@/components/common/StatCard';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { Users, CheckCircle, Clock, TrendingUp, Star, Calendar } from 'lucide-react';
-import * as Tabs from '@radix-ui/react-tabs';
+import * as Tabs from '@radix-ui/react-tabs';import { log, logError } from '@/lib/utils/logger';
+
 
 export default function DoctorStats() {
   const { user } = useAuth();
@@ -40,7 +41,7 @@ export default function DoctorStats() {
         let completed = 0;
         let pending = 0;
         let cancelled = 0;
-        let patients = new Set();
+        const patients = new Set();
         let currentMonthCount = 0;
 
         const currentMonth = new Date().getMonth();
@@ -81,7 +82,7 @@ export default function DoctorStats() {
 
         setMonthlyChart(monthlyData);
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch stats:', err);
+        logError('[TeleZeta] Failed to fetch stats:', err);
       } finally {
         setLoading(false);
       }

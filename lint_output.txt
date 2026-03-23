@@ -1,0 +1,237 @@
+
+> telezeta@0.1.0 lint
+> eslint
+
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/consultation/[id]/page.tsx
+    9:15  warning  'Appointment' is defined but never used        @typescript-eslint/no-unused-vars
+    9:28  warning  'ChatMessage' is defined but never used        @typescript-eslint/no-unused-vars
+   13:84  warning  'X' is defined but never used                  @typescript-eslint/no-unused-vars
+   14:70  warning  'log' is defined but never used                @typescript-eslint/no-unused-vars
+   31:50  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   38:10  warning  'isJoined' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   83:21  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  294:34  warning  'index' is defined but never used              @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/doctor/page.tsx
+   13:10   warning  'MOCK_APPOINTMENTS' is defined but never used  @typescript-eslint/no-unused-vars
+   15:29   warning  'Calendar' is defined but never used           @typescript-eslint/no-unused-vars
+   15:56   warning  'Users' is defined but never used              @typescript-eslint/no-unused-vars
+   15:63   warning  'FileText' is defined but never used           @typescript-eslint/no-unused-vars
+   15:73   warning  'Settings' is defined but never used           @typescript-eslint/no-unused-vars
+   15:148  warning  'log' is defined but never used                @typescript-eslint/no-unused-vars
+   23:48   error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   24:52   error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  303:54   error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/doctor/patients/page.tsx
+    8:24  warning  'Appointment' is defined but never used   @typescript-eslint/no-unused-vars
+   11:24  warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+   11:44  warning  'History' is defined but never used       @typescript-eslint/no-unused-vars
+   11:53  warning  'ArrowRight' is defined but never used    @typescript-eslint/no-unused-vars
+   12:59  warning  'log' is defined but never used           @typescript-eslint/no-unused-vars
+   49:18  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:40  warning  'idx' is defined but never used           @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/doctor/profile/page.tsx
+   12:62   warning  'Shield' is defined but never used               @typescript-eslint/no-unused-vars
+   12:85   warning  'FileText' is defined but never used             @typescript-eslint/no-unused-vars
+   12:135  warning  'log' is defined but never used                  @typescript-eslint/no-unused-vars
+   34:50   error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+   35:10   warning  'doctorData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   35:48   error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+   47:45   error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  120:29   error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  121:28   error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  160:29   error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/doctor/schedule/page.tsx
+    5:8   warning  'Link' is defined but never used           @typescript-eslint/no-unused-vars
+   14:27  warning  'Video' is defined but never used          @typescript-eslint/no-unused-vars
+   14:34  warning  'MessageSquare' is defined but never used  @typescript-eslint/no-unused-vars
+   15:55  warning  'log' is defined but never used            @typescript-eslint/no-unused-vars
+   42:41  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  113:42  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/doctor/stats/page.tsx
+   7:8   warning  'StatCard' is defined but never used                 @typescript-eslint/no-unused-vars
+  10:13  warning  'Tabs' is defined but never used                     @typescript-eslint/no-unused-vars
+  10:55  warning  'log' is defined but never used                      @typescript-eslint/no-unused-vars
+  44:13  error    'patients' is never reassigned. Use 'const' instead  prefer-const
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/doctor/write-record/page.tsx
+   15:39  warning  'log' is defined but never used                                  @typescript-eslint/no-unused-vars
+   44:50  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  101:21  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  345:66  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  345:78  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/error.tsx
+  3:44  warning  'log' is defined but never used    @typescript-eslint/no-unused-vars
+  8:3   warning  'reset' is defined but never used  @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/page.tsx
+  9:82  warning  'logError' is defined but never used  @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/patient/appointments/page.tsx
+    8:10  warning  'MOCK_APPOINTMENTS' is defined but never used    @typescript-eslint/no-unused-vars
+   14:27  warning  'Video' is defined but never used                @typescript-eslint/no-unused-vars
+   14:34  warning  'MessageSquare' is defined but never used        @typescript-eslint/no-unused-vars
+   14:80  warning  'Share2' is defined but never used               @typescript-eslint/no-unused-vars
+   15:55  warning  'log' is defined but never used                  @typescript-eslint/no-unused-vars
+  121:19  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  129:9   warning  'isPast' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  136:11  warning  'isUpcoming' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  153:42  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/patient/doctors/page.tsx
+   15:59  warning  'log' is defined but never used            @typescript-eslint/no-unused-vars
+  119:15  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  155:19  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/patient/page.tsx
+   1:10  warning  'Suspense' is defined but never used  @typescript-eslint/no-unused-vars
+   9:54  warning  'Pill' is defined but never used      @typescript-eslint/no-unused-vars
+  10:76  warning  'log' is defined but never used       @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/patient/prescriptions/page.tsx
+    7:10  warning  'MOCK_PRESCRIPTIONS' is defined but never used  @typescript-eslint/no-unused-vars
+   12:38  warning  'ArrowRight' is defined but never used          @typescript-eslint/no-unused-vars
+   13:59  warning  'log' is defined but never used                 @typescript-eslint/no-unused-vars
+   48:34  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   87:30  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   87:47  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  141:47  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  150:74  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  220:62  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  294:79  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/patient/profile/page.tsx
+  13:108  warning  'log' is defined but never used                   @typescript-eslint/no-unused-vars
+  26:26   warning  'authProfile' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  38:5    warning  'setValue' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/patient/records/page.tsx
+   8:10  warning  'MOCK_MEDICAL_RECORDS' is defined but never used  @typescript-eslint/no-unused-vars
+  13:59  warning  'log' is defined but never used                   @typescript-eslint/no-unused-vars
+  59:28  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  64:49  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/pharmacist/history/page.tsx
+    9:10  warning  'formatDate' is defined but never used       @typescript-eslint/no-unused-vars
+    9:34  warning  'formatDateShort' is defined but never used  @typescript-eslint/no-unused-vars
+    9:91  warning  'log' is defined but never used              @typescript-eslint/no-unused-vars
+   12:26  warning  'User' is defined but never used             @typescript-eslint/no-unused-vars
+   20:54  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+   69:41  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+   76:56  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  175:43  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  228:72  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/pharmacist/inventory/page.tsx
+  38:5   warning  'setValue' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  40:47  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  59:16  warning  'err' is defined but never used                @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/pharmacist/page.tsx
+    8:8    warning  'StatCard' is defined but never used          @typescript-eslint/no-unused-vars
+   12:122  warning  'log' is defined but never used               @typescript-eslint/no-unused-vars
+   16:17   warning  'profile' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   19:56   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+   20:52   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  190:52   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/pharmacist/profile/page.tsx
+   11:112  warning  'log' is defined but never used                      @typescript-eslint/no-unused-vars
+   29:50   error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+   30:10   warning  'pharmacistData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   30:56   error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  106:29   error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  107:32   error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/dashboard/pharmacist/queue/page.tsx
+    9:82  warning  'log' is defined but never used           @typescript-eslint/no-unused-vars
+   12:40  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
+   13:9   warning  'User' is defined but never used          @typescript-eslint/no-unused-vars
+   13:15  warning  'ArrowRight' is defined but never used    @typescript-eslint/no-unused-vars
+   13:36  warning  'Filter' is defined but never used        @typescript-eslint/no-unused-vars
+   22:54  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   30:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   83:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  311:77  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/layout.tsx
+  31:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/login/page.tsx
+  67:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/page.tsx
+   29:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  168:37  warning  'i' is defined but never used    @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/app/register/page.tsx
+    8:19   warning  'FormProvider' is defined but never used      @typescript-eslint/no-unused-vars
+   18:129  warning  'log' is defined but never used               @typescript-eslint/no-unused-vars
+   22:9    warning  'router' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   29:44   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+   50:37   warning  'isValid' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   51:5    warning  'trigger' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   54:61   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+   60:31   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+   62:46   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+   63:24   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+   78:33   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  178:19   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/components/common/StatCard.tsx
+  23:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/components/common/StatCard.tsx:23:7
+  21 |
+  22 |     if (prefersReducedMotion) {
+> 23 |       setDisplayValue(value);
+     |       ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  24 |       return;
+  25 |     }
+  26 |  react-hooks/set-state-in-effect
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/components/layout/Sidebar.tsx
+  13:67  warning  'Loader2' is defined but never used  @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/components/layout/TopBar.tsx
+  33:7  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/components/layout/TopBar.tsx:33:7
+  31 |   useEffect(() => {
+  32 |     if (unreadCount > prevUnread) {
+> 33 |       setWiggle(true);
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |       const timer = setTimeout(() => setWiggle(false), 500);
+  35 |       return () => clearTimeout(timer);
+  36 |     }  react-hooks/set-state-in-effect
+  38:6  warning  React Hook useEffect has a missing dependency: 'prevUnread'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/lib/hooks/useNotifications.ts
+  7:63  warning  'logError' is defined but never used  @typescript-eslint/no-unused-vars
+
+/mnt/aa57bb54-fe37-4b0d-aa64-b9333df927dc/Coding/telezeta/lib/hooks/useRealtimeChat.ts
+    7:58  warning  'logError' is defined but never used      @typescript-eslint/no-unused-vars
+  101:49  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 141 problems (60 errors, 81 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

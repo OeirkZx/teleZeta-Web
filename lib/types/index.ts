@@ -16,7 +16,7 @@ export interface Profile {
   role: UserRole;
   full_name: string;
   phone?: string;
-  avatar_url?: string;
+  avatar_url?: string | null;
   date_of_birth?: string;
   gender?: Gender;
   city?: string;
@@ -63,7 +63,7 @@ export interface Appointment {
   daily_room_name?: string;
   daily_room_url?: string;
   consultation_fee: number;
-  notes?: string;
+  notes?: string | null;
   created_at: string;
   updated_at: string;
   // Joined fields
@@ -205,7 +205,7 @@ export const MOCK_DOCTORS: (Doctor & { profiles: Profile })[] = [
       role: 'doctor',
       full_name: 'dr. Ahmad Fadillah, Sp.PD',
       phone: '08123456789',
-      avatar_url: null as unknown as string,
+      avatar_url: null,
       gender: 'L',
       city: 'Jakarta',
       created_at: new Date().toISOString(),
@@ -231,7 +231,7 @@ export const MOCK_DOCTORS: (Doctor & { profiles: Profile })[] = [
       role: 'doctor',
       full_name: 'dr. Siti Rahayu, Sp.JP',
       phone: '08234567890',
-      avatar_url: null as unknown as string,
+      avatar_url: null,
       gender: 'P',
       city: 'Jakarta',
       created_at: new Date().toISOString(),
@@ -257,7 +257,7 @@ export const MOCK_DOCTORS: (Doctor & { profiles: Profile })[] = [
       role: 'doctor',
       full_name: 'dr. Budi Santoso, Sp.A',
       phone: '08345678901',
-      avatar_url: null as unknown as string,
+      avatar_url: null,
       gender: 'L',
       city: 'Bandung',
       created_at: new Date().toISOString(),
@@ -283,7 +283,7 @@ export const MOCK_DOCTORS: (Doctor & { profiles: Profile })[] = [
       role: 'doctor',
       full_name: 'dr. Diana Putri, Sp.KK',
       phone: '08456789012',
-      avatar_url: null as unknown as string,
+      avatar_url: null,
       gender: 'P',
       city: 'Surabaya',
       created_at: new Date().toISOString(),
@@ -309,7 +309,7 @@ export const MOCK_DOCTORS: (Doctor & { profiles: Profile })[] = [
       role: 'doctor',
       full_name: 'dr. Rina Wati, Sp.OG',
       phone: '08567890123',
-      avatar_url: null as unknown as string,
+      avatar_url: null,
       gender: 'P',
       city: 'Jakarta',
       created_at: new Date().toISOString(),
@@ -330,7 +330,7 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
     daily_room_name: 'telezeta-apt-1',
     daily_room_url: 'https://telezeta.daily.co/telezeta-apt-1',
     consultation_fee: 75000,
-    notes: null as unknown as string,
+    notes: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     doctor: MOCK_DOCTORS[0],
@@ -344,7 +344,7 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
     status: 'pending',
     chief_complaint: 'Konsultasi tekanan darah tinggi',
     consultation_fee: 100000,
-    notes: null as unknown as string,
+    notes: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     doctor: MOCK_DOCTORS[1],

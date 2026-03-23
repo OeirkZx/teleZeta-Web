@@ -15,7 +15,8 @@ import {
   doctorStep1Schema, doctorStep2Schema, doctorStep3Schema,
   pharmacistStep1Schema, pharmacistStep2Schema, pharmacistStep3Schema
 } from '@/lib/utils/validators';
-import { User, Stethoscope, Briefcase, ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User, Stethoscope, Briefcase, ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';import { log, logError } from '@/lib/utils/logger';
+
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -58,8 +59,8 @@ export default function RegisterPage() {
   // that TS can't narrow, but each render branch only accesses its own step's fields
   const errors = rawErrors as any;
 
-  const handleNext = async (currentStepData: any) => {
-    setFormData((prev: any) => ({ ...prev, ...currentStepData }));
+  const handleNext = async (currentStepData: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    setFormData((prev: any) => ({ ...prev, ...currentStepData })); // eslint-disable-line @typescript-eslint/no-explicit-any
     setStep(prev => prev + 1);
     setTimeout(() => reset({}), 50);
   };
@@ -74,7 +75,7 @@ export default function RegisterPage() {
     }
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const currentStepData = { ...data };
     if (currentStepData['register-email']) {
       currentStepData.email = currentStepData['register-email'];
@@ -115,19 +116,34 @@ export default function RegisterPage() {
 
       const userId = authData.user.id;
 
-      // Wait a moment for the DB trigger to build the profile
-      await new Promise(r => setTimeout(r, 1000));
+      async function waitForProfile(userId: string): Promise<boolean> {
+        for (let i = 0; i < 6; i++) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', userId)
+            .single();
+          if (data) return true;
+          await new Promise(r => setTimeout(r, 500 * (i + 1)));
+        }
+        return false;
+      }
 
-      // 2. Update profiles table with extra data collected during registration
-      const { error: profileError } = await supabase.from('profiles').update({
-        full_name: finalFullName,
-        phone: allData.phone || null,
-        date_of_birth: allData.date_of_birth || null,
-        gender: allData.gender || null,
-      }).eq('id', userId);
+      const profileReady = await waitForProfile(userId);
+      if (!profileReady) {
+        console.warn('[TeleZeta] Profile not ready after retries, skipping update');
+      } else {
+        // 2. Update profiles table with extra data collected during registration
+        const { error: profileError } = await supabase.from('profiles').update({
+          full_name: finalFullName,
+          phone: allData.phone || null,
+          date_of_birth: allData.date_of_birth || null,
+          gender: allData.gender || null,
+        }).eq('id', userId);
 
-      if (profileError) {
-        console.error('[TeleZeta] Error updating profile:', profileError);
+        if (profileError) {
+          logError('[TeleZeta] Error updating profile:', profileError);
+        }
       }
 
       // 3. Insert role-specific data using admin privileges or normal insert 
@@ -141,7 +157,7 @@ export default function RegisterPage() {
           hospital: allData.hospital,
         });
         if (doctorError) {
-          console.error('[TeleZeta] Error inserting doctor:', doctorError);
+          logError('[TeleZeta] Error inserting doctor:', doctorError);
           // Don't fail the whole registration if this fails, they can complete profile later
         }
       } else if (role === 'pharmacist') {
@@ -151,7 +167,7 @@ export default function RegisterPage() {
           pharmacy_name: allData.pharmacy_name,
         });
         if (pharmError) {
-          console.error('[TeleZeta] Error inserting pharmacist:', pharmError);
+          logError('[TeleZeta] Error inserting pharmacist:', pharmError);
         }
       }
 
@@ -159,7 +175,7 @@ export default function RegisterPage() {
       await supabase.auth.signOut();
       setIsSuccess(true);
 
-    } catch (err: any) {
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
       setError(err.message || 'Terjadi kesalahan saat mendaftar');
       setIsLoading(false);
     }
@@ -514,7 +530,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-lg mb-12 animate-pageIn">
         <div className="flex justify-center mb-8">
           <Link href="/">
-            <TeleZetaLogo variant="dark" size="md" />
+            <TeleZetaLogo variant="dark" size="md" priority={true} />
           </Link>
         </div>
 

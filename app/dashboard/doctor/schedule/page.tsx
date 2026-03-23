@@ -12,7 +12,8 @@ import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { formatTimeWIB } from '@/lib/utils/formatters';
 import { Calendar, Clock, Video, MessageSquare, ArrowRight, Check, X } from 'lucide-react';
-import * as Tabs from '@radix-ui/react-tabs';
+import * as Tabs from '@radix-ui/react-tabs';import { log, logError } from '@/lib/utils/logger';
+
 
 type AppointmentWithPatient = Appointment & { 
   patient: Profile 
@@ -40,7 +41,7 @@ export default function DoctorSchedule() {
         if (error) throw error;
         setAppointments((data || []) as any[]);
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch schedule:', err);
+        logError('[TeleZeta] Failed to fetch schedule:', err);
       } finally {
         setLoading(false);
       }
@@ -80,7 +81,7 @@ export default function DoctorSchedule() {
         });
       }
     } catch (err) {
-      console.error('[TeleZeta] Failed to update appointment:', err);
+      logError('[TeleZeta] Failed to update appointment:', err);
       alert('Gagal memperbarui status. Silakan coba lagi.');
     } finally {
       setUpdatingId(null);
@@ -157,7 +158,7 @@ export default function DoctorSchedule() {
                 onClick={() => {
                   const appointmentId = app?.id;
                   if (!appointmentId) {
-                    console.error('[TeleZeta] app.id is undefined:', app);
+                    logError('[TeleZeta] app.id is undefined:', app);
                     return;
                   }
                   router.push(`/consultation/${appointmentId}`);

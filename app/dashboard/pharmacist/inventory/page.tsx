@@ -14,7 +14,8 @@ import {
   Package, Search, Plus, AlertTriangle, Edit3, Trash2,
   X, Loader2, CheckCircle2, BarChart3, TrendingDown, Archive
 } from 'lucide-react';
-import * as Dialog from '@radix-ui/react-dialog';
+import * as Dialog from '@radix-ui/react-dialog';import { log, logError } from '@/lib/utils/logger';
+
 
 export default function PharmacistInventory() {
   const { user } = useAuth();
@@ -50,13 +51,13 @@ export default function PharmacistInventory() {
           .order('medicine_name', { ascending: true });
 
         if (error) {
-          console.log('[TeleZeta] Inventory fetch error, using mock data:', error.message);
+          log('[TeleZeta] Inventory fetch error, using mock data:', error.message);
           setItems(MOCK_INVENTORY);
         } else {
           setItems(data?.length ? data : MOCK_INVENTORY);
         }
       } catch (err) {
-        console.log('[TeleZeta] Using mock inventory data');
+        log('[TeleZeta] Using mock inventory data');
         setItems(MOCK_INVENTORY);
       } finally {
         setLoading(false);
@@ -103,7 +104,7 @@ export default function PharmacistInventory() {
           .eq('id', editingItem.id);
 
         if (error) {
-          console.log('[TeleZeta] Update error, updating locally:', error.message);
+          log('[TeleZeta] Update error, updating locally:', error.message);
         }
 
         setItems(prev =>
@@ -130,7 +131,7 @@ export default function PharmacistInventory() {
         });
 
         if (error) {
-          console.log('[TeleZeta] Insert error, adding locally:', error.message);
+          log('[TeleZeta] Insert error, adding locally:', error.message);
         }
 
         setItems(prev => [...prev, newItem].sort((a, b) =>
@@ -141,7 +142,7 @@ export default function PharmacistInventory() {
 
       setDialogOpen(false);
     } catch (err) {
-      console.error('[TeleZeta] Save inventory error:', err);
+      logError('[TeleZeta] Save inventory error:', err);
       alert('Gagal menyimpan data. Silakan coba lagi.');
     } finally {
       setSaving(false);
@@ -153,10 +154,10 @@ export default function PharmacistInventory() {
     setDeletingId(id);
     try {
       const { error } = await supabase.from('inventory').delete().eq('id', id);
-      if (error) console.log('[TeleZeta] Delete error:', error.message);
+      if (error) log('[TeleZeta] Delete error:', error.message);
       setItems(prev => prev.filter(item => item.id !== id));
     } catch (err) {
-      console.error('[TeleZeta] Delete error:', err);
+      logError('[TeleZeta] Delete error:', err);
     } finally {
       setDeletingId(null);
     }

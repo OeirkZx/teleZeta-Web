@@ -12,7 +12,8 @@ import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { formatTimeWIB } from '@/lib/utils/formatters';
 import { Calendar, Clock, Video, MessageSquare, ArrowRight, XCircle, FileText, Share2, Star, AlertCircle } from 'lucide-react';
-import * as Tabs from '@radix-ui/react-tabs';
+import * as Tabs from '@radix-ui/react-tabs';import { log, logError } from '@/lib/utils/logger';
+
 
 type AppointmentWithDoctor = Appointment & { 
   doctor: Doctor & { profiles: Profile } 
@@ -48,7 +49,7 @@ export default function PatientAppointments() {
         setAppointments((data || []) as unknown as AppointmentWithDoctor[]);
         
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch appointments:', err);
+        logError('[TeleZeta] Failed to fetch appointments:', err);
         setAppointments([]);
         setErrorMsg('Gagal memuat jadwal. Silakan muat ulang halaman.');
       } finally {
@@ -88,7 +89,7 @@ export default function PatientAppointments() {
         });
       }
     } catch (err) {
-      console.error('[TeleZeta] Failed to cancel appointment:', err);
+      logError('[TeleZeta] Failed to cancel appointment:', err);
       alert('Gagal membatalkan jadwal. Silakan coba lagi.');
     } finally {
       setCancelingId(null);
@@ -117,8 +118,8 @@ export default function PatientAppointments() {
       setReviewTargetId(null);
       setReviewRating(5);
       setReviewComment('');
-    } catch (err: any) {
-      console.error('[TeleZeta] Failed to submit review:', err);
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
+      logError('[TeleZeta] Failed to submit review:', err);
       alert('Gagal mengirim ulasan: ' + err.message);
     } finally {
       setSubmittingReview(false);

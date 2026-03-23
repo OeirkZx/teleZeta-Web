@@ -5,7 +5,8 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile, UserRole } from '@/lib/types';
-import type { User } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';import { log, logError } from '@/lib/utils/logger';
+
 
 interface AuthState {
   user: User | null;
@@ -35,12 +36,12 @@ export function useAuth() {
         .single();
 
       if (error) {
-        console.log('[TeleZeta] Error fetching profile:', error.message);
+        log('[TeleZeta] Error fetching profile:', error.message);
         return null;
       }
       return data as Profile;
     } catch (err) {
-      console.log('[TeleZeta] Profile fetch failed:', err);
+      log('[TeleZeta] Profile fetch failed:', err);
       return null;
     }
   }, [supabase]);
@@ -65,7 +66,7 @@ export function useAuth() {
           error: null,
         });
       } catch (err) {
-        console.log('[TeleZeta] Auth error:', err);
+        log('[TeleZeta] Auth error:', err);
         setState(prev => ({ ...prev, loading: false, error: 'Gagal memuat sesi' }));
       }
     };
@@ -75,7 +76,7 @@ export function useAuth() {
     // Listen to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('[TeleZeta] Auth event:', event);
+        log('[TeleZeta] Auth event:', event);
 
         if (event === 'SIGNED_IN' && session?.user) {
           const profile = await fetchProfile(session.user.id);
@@ -112,7 +113,7 @@ export function useAuth() {
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error('[TeleZeta] Sign out error:', error);
+        logError('[TeleZeta] Sign out error:', error);
       }
       
       // Reset state secara manual untuk memastikan
@@ -134,7 +135,7 @@ export function useAuth() {
       window.location.replace('/login');
       
     } catch (err) {
-      console.error('[TeleZeta] Sign out failed:', err);
+      logError('[TeleZeta] Sign out failed:', err);
       // Force redirect meskipun ada error
       window.location.replace('/login');
     }

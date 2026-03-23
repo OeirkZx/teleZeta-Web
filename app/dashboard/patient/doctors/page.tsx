@@ -1,7 +1,7 @@
 // [TeleZeta] Patient Doctors List & Booking Flow
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -9,10 +9,11 @@ import { MOCK_DOCTORS } from '@/lib/types';
 import type { Doctor, Profile } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
-import { Skeleton } from '@/components/common/LoadingSkeleton';
+import { Skeleton, PageSkeleton } from '@/components/common/LoadingSkeleton';
 import { formatRupiah } from '@/lib/utils/formatters';
 import { Search, Filter, Star, Clock, Video, MessageSquare, ArrowRight, Loader2, Calendar as CalendarIcon, CheckCircle2, X, AlertCircle } from 'lucide-react';
-import * as Dialog from '@radix-ui/react-dialog';
+import * as Dialog from '@radix-ui/react-dialog';import { log, logError } from '@/lib/utils/logger';
+
 
 type DoctorWithProfile = Doctor & { profiles: Profile };
 
@@ -27,13 +28,12 @@ const SPECIALTIES = [
   'Psikiatri'
 ];
 
-export default function DoctorsPage() {
+function DoctorsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preSelectedId = searchParams.get('selected');
   const { user, profile } = useAuth();
-  // Call createClient but we don't need it in deps since it's used inside
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [doctors, setDoctors] = useState<DoctorWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +63,7 @@ export default function DoctorsPage() {
         }
         setDoctors(data as DoctorWithProfile[]);
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch doctors:', err);
+        logError('[TeleZeta] Failed to fetch doctors:', err);
         setDoctors(MOCK_DOCTORS); // Fallback
       } finally {
         setLoading(false);
@@ -152,8 +152,8 @@ export default function DoctorsPage() {
 
       // Success
       setBookingStep(4); // Show success view
-    } catch (err: any) {
-      console.error('[TeleZeta] Booking failed:', err);
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
+      logError('[TeleZeta] Booking failed:', err);
       // For demo purposes, if it fails due to RLS or missing setup, we still act like it succeeded
       setBookingStep(4);
     } finally {
@@ -503,5 +503,13 @@ export default function DoctorsPage() {
       </Dialog.Root>
 
     </div>
+  );
+}
+
+export default function DoctorsPage() {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <DoctorsPageContent />
+    </Suspense>
   );
 }

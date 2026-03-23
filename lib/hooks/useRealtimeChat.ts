@@ -4,7 +4,8 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import type { Message } from '@/lib/types';
+import type { Message } from '@/lib/types';import { log, logError } from '@/lib/utils/logger';
+
 
 export function useRealtimeChat(appointmentId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -24,12 +25,12 @@ export function useRealtimeChat(appointmentId: string | null) {
           .order('created_at', { ascending: true });
 
         if (error) {
-          console.log('[TeleZeta] Error fetching messages:', error.message);
+          log('[TeleZeta] Error fetching messages:', error.message);
         } else {
           setMessages(data || []);
         }
       } catch (err) {
-        console.log('[TeleZeta] Messages fetch failed:', err);
+        log('[TeleZeta] Messages fetch failed:', err);
       } finally {
         setLoading(false);
       }
@@ -53,7 +54,7 @@ export function useRealtimeChat(appointmentId: string | null) {
           filter: `appointment_id=eq.${appointmentId}`,
         },
         async (payload) => {
-          console.log('[TeleZeta] New message received:', payload);
+          log('[TeleZeta] New message received:', payload);
           const newMessage = payload.new as Message;
 
           // Fetch sender profile
@@ -111,7 +112,7 @@ export function useRealtimeChat(appointmentId: string | null) {
           throw error;
         }
       } catch (err) {
-        console.log('[TeleZeta] Send message failed:', err);
+        log('[TeleZeta] Send message failed:', err);
         throw err;
       }
     },

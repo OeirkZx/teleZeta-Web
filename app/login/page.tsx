@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createClient } from '@/lib/supabase/client';
 import { loginSchema, type LoginFormData } from '@/lib/utils/validators';
 import TeleZetaLogo from '@/components/common/TeleZetaLogo';
-import { Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
 import { Suspense, useEffect } from 'react';
 
 function LoginForm() {
@@ -64,7 +64,7 @@ function LoginForm() {
       
       setResetMessage('Link reset password telah dikirim ke email Anda');
       setResetEmail('');
-    } catch (err: any) {
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
       setError(err.message || 'Gagal mengirim link reset password');
     } finally {
       setIsResetting(false);
@@ -94,7 +94,7 @@ function LoginForm() {
       // Refresh router to trigger middleware and redirect to correct dashboard
       router.refresh();
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
       setError(err.message || 'Terjadi kesalahan saat masuk');
       setIsLoading(false);
     }
@@ -104,7 +104,7 @@ function LoginForm() {
     <div className="w-full max-w-md animate-pageIn">
       <div className="card p-8 shadow-xl">
         <div className="flex justify-center mb-8">
-          <TeleZetaLogo variant="dark" size="lg" />
+          <TeleZetaLogo variant="dark" size="lg" priority={true} />
         </div>
 
         <div className="text-center mb-8">
@@ -128,7 +128,7 @@ function LoginForm() {
 
         {resetMessage && (
           <div className="mb-6 p-4 rounded-lg flex items-start gap-3 bg-green-50 text-green-700 border border-green-100 animate-slideRight">
-            <AlertCircle className="w-5 h-5 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 shrink-0" />
             <p className="text-sm font-medium">{resetMessage}</p>
           </div>
         )}

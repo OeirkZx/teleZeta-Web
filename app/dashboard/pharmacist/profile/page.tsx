@@ -8,7 +8,8 @@ import * as z from 'zod';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { Store, Mail, Phone, Loader2, CheckCircle2, MapPin, FileCheck, Building } from 'lucide-react';
+import { Store, Mail, Phone, Loader2, CheckCircle2, MapPin, FileCheck, Building } from 'lucide-react';import { log, logError } from '@/lib/utils/logger';
+
 
 const profileSchema = z.object({
   phone: z.string().min(10, "Nomor telepon minimal 10 digit").optional().or(z.literal('')),
@@ -62,7 +63,7 @@ export default function PharmacistProfile() {
           license_number: pharmRes.data?.license_number || '',
         });
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch profile:', err);
+        logError('[TeleZeta] Failed to fetch profile:', err);
       } finally {
         setLoading(false);
       }
@@ -102,14 +103,14 @@ export default function PharmacistProfile() {
         
       if (pharmError) throw pharmError;
 
-      setProfileData((prev: any) => ({ ...prev, phone }));
-      setPharmacistData((prev: any) => ({ ...prev, pharmacy_name, address, license_number }));
+      setProfileData((prev: any) => ({ ...prev, phone })); // eslint-disable-line @typescript-eslint/no-explicit-any
+      setPharmacistData((prev: any) => ({ ...prev, pharmacy_name, address, license_number })); // eslint-disable-line @typescript-eslint/no-explicit-any
       setSuccess(true);
       
       setTimeout(() => setSuccess(false), 3000);
       reset(data);
     } catch (err) {
-      console.error('[TeleZeta] Failed to update profile:', err);
+      logError('[TeleZeta] Failed to update profile:', err);
       alert('Gagal menyimpan profil. Silakan coba lagi.');
     } finally {
       setSaving(false);

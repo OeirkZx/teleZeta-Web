@@ -1,6 +1,6 @@
 # TeleZeta — Platform Telemedicine
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-Database-green?style=flat-square&logo=supabase)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?style=flat-square&logo=tailwindcss)
@@ -26,7 +26,7 @@ TeleZeta adalah platform telemedicine fullstack yang menghubungkan pasien dengan
 
 | Layer | Teknologi |
 |-------|-----------|
-| Frontend | Next.js 14 (App Router) + TypeScript |
+| Frontend | Next.js 16 (App Router) + TypeScript |
 | Styling | Tailwind CSS + Custom Design System |
 | Backend | Supabase (PostgreSQL + Auth + Realtime) |
 | Video Call | Daily.co |
@@ -54,11 +54,13 @@ npm install
 
 ### Konfigurasi Environment
 
+> **Demo Mode**: Aplikasi bisa dijalankan tanpa konfigurasi Supabase.
+> Dalam mode demo, data mock akan digunakan sebagai pengganti database.
+
 Buat file `.env.local` di root project:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 DAILY_API_KEY=your_daily_api_key
 NEXT_PUBLIC_DAILY_URL=your_daily_room_url
 NEXT_PUBLIC_APP_URL=http://localhost:3000

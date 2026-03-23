@@ -10,7 +10,8 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import type { Profile } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
-import { User, Mail, Phone, Calendar, Loader2, CheckCircle2, Shield, Camera } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Loader2, CheckCircle2, Shield, Camera } from 'lucide-react';import { log, logError } from '@/lib/utils/logger';
+
 
 const profileSchema = z.object({
   full_name: z.string().min(3, "Nama lengkap minimal 3 karakter"),
@@ -63,7 +64,7 @@ export default function PatientProfile() {
           gender: data.gender || '',
         });
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch profile:', err);
+        logError('[TeleZeta] Failed to fetch profile:', err);
       } finally {
         setLoading(false);
       }
@@ -99,7 +100,7 @@ export default function PatientProfile() {
       // Reset isDirty state by calling reset with current values
       reset(data);
     } catch (err) {
-      console.error('[TeleZeta] Failed to update profile:', err);
+      logError('[TeleZeta] Failed to update profile:', err);
       alert('Gagal menyimpan profil. Silakan coba lagi.');
     } finally {
       setSaving(false);
@@ -125,7 +126,7 @@ export default function PatientProfile() {
 
       if (uploadError) {
         // If bucket doesn't exist, just show an alert for the demo
-        console.error('Upload Error:', uploadError);
+        logError('Upload Error:', uploadError);
         alert('Gagal mengunggah foto. Pastikan bucket "avatars" sudah dibuat di Supabase.');
         return;
       }
@@ -147,7 +148,7 @@ export default function PatientProfile() {
       alert('Foto profil berhasil diperbarui!');
       
     } catch (error) {
-      console.error('Error uploading avatar:', error);
+      logError('Error uploading avatar:', error);
       alert('Terjadi kesalahan saat mengunggah foto.');
     } finally {
       setAvatarUploading(false);

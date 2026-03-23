@@ -25,17 +25,18 @@ export default function TopBar({ userId, profile, onMenuClick }: TopBarProps) {
   const notifications: Notification[] = realNotifications;
   const unreadCount = realUnread;
   
-  const [prevUnread, setPrevUnread] = useState(unreadCount);
+  const prevUnreadRef = useRef(unreadCount);
   const [wiggle, setWiggle] = useState(false);
 
   useEffect(() => {
-    if (unreadCount > prevUnread) {
+    if (unreadCount > prevUnreadRef.current) {
       setWiggle(true);
       const timer = setTimeout(() => setWiggle(false), 500);
+      prevUnreadRef.current = unreadCount;
       return () => clearTimeout(timer);
     }
-    setPrevUnread(unreadCount);
-  }, [unreadCount]); // intentionally exclude prevUnread to avoid loop
+    prevUnreadRef.current = unreadCount;
+  }, [unreadCount]);
 
   // Close dropdown on outside click
   useEffect(() => {

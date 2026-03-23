@@ -7,7 +7,8 @@ import StatCard from '@/components/common/StatCard';
 import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { ArrowRight, Video, Calendar, ClipboardList, Pill, Clock } from 'lucide-react';
-import { formatTime, formatRupiah } from '@/lib/utils/formatters';
+import { formatTime, formatRupiah } from '@/lib/utils/formatters';import { log, logError } from '@/lib/utils/logger';
+
 
 async function getDashboardData() {
   const supabase = await createClient();
@@ -80,7 +81,7 @@ async function getDashboardData() {
     };
 
   } catch (err) {
-    console.error('[TeleZeta] Failed to fetch dashboard data:', err);
+    logError('[TeleZeta] Failed to fetch dashboard data:', err);
     return {
       profile: { full_name: 'Pengguna' },
       todayAppointment: null,

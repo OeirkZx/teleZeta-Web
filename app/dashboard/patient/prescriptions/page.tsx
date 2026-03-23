@@ -10,7 +10,8 @@ import { formatTime } from '@/lib/utils/formatters';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import Badge from '@/components/common/Badge';
 import { Pill, Search, Store, Clock, ArrowRight, User, Package, CheckCircle2, AlertCircle } from 'lucide-react';
-import * as Dialog from '@radix-ui/react-dialog';
+import * as Dialog from '@radix-ui/react-dialog';import { log, logError } from '@/lib/utils/logger';
+
 
 // Helper type for joined query
 type EnrichedPrescription = Prescription & {
@@ -46,7 +47,7 @@ export default function PatientPrescriptions() {
         if (error) throw error;
         setPrescriptions(data as any[]);
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch prescriptions:', err);
+        logError('[TeleZeta] Failed to fetch prescriptions:', err);
         setPrescriptions([]);
         setErrorMsg('Gagal memuat resep. Silakan muat ulang halaman.');
       } finally {
@@ -74,7 +75,7 @@ export default function PatientPrescriptions() {
       
       alert('Berhasil! Resep Anda sedang diproses oleh apotek.');
     } catch (err) {
-      console.error('[TeleZeta] Error redeeming prescription:', err);
+      logError('[TeleZeta] Error redeeming prescription:', err);
       alert('Gagal memproses resep. Silakan coba lagi nanti.');
     } finally {
       setProcessingId(null);
@@ -83,7 +84,7 @@ export default function PatientPrescriptions() {
   };
 
   const filteredPrescriptions = prescriptions.filter(p => 
-    (p.prescription_items as any[])?.some((m: any) => m.medicine_name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (p.prescription_items as any[])?.some((m: any) => m.medicine_name?.toLowerCase().includes(searchQuery.toLowerCase())) || // eslint-disable-line @typescript-eslint/no-explicit-any
     p.doctor?.profiles.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -146,7 +147,7 @@ export default function PatientPrescriptions() {
                   <span className="text-xs font-normal text-blue-600 cursor-pointer" onClick={() => setSelectedPrescription(pres)}>Lihat Detail</span>
                 </h3>
                 <ul className="space-y-2 mb-4">
-                  {(pres.prescription_items || []).slice(0, 2).map((med: any, i: number) => (
+                  {(pres.prescription_items || []).slice(0, 2).map((med: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                     <li key={i} className="flex items-start gap-2 text-sm text-gray-700 bg-gray-50 p-2 rounded-lg">
                       <span className="shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-blue-500" />
                       <div>
@@ -290,7 +291,7 @@ export default function PatientPrescriptions() {
               <div className="mb-6">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Daftar Obat</p>
                 <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
-                  {(selectedPrescription?.prescription_items || []).map((med: any, i: number) => (
+                  {(selectedPrescription?.prescription_items || []).map((med: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                     <div key={i} className="p-4 bg-white flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
                         <span className="font-bold text-sm">{i+1}</span>

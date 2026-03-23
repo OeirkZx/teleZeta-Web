@@ -4,7 +4,8 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import type { Notification } from '@/lib/types';
+import type { Notification } from '@/lib/types';import { log, logError } from '@/lib/utils/logger';
+
 
 export function useNotifications(userId: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -31,13 +32,13 @@ export function useNotifications(userId: string | null) {
           .limit(20);
 
         if (error) {
-          console.log('[TeleZeta] Error fetching notifications:', error.message);
+          log('[TeleZeta] Error fetching notifications:', error.message);
         } else if (isMounted) {
           setNotifications(data || []);
           setUnreadCount(data?.filter((n: Notification) => !n.is_read).length || 0);
         }
       } catch (err) {
-        console.log('[TeleZeta] Notifications fetch failed:', err);
+        log('[TeleZeta] Notifications fetch failed:', err);
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -67,7 +68,7 @@ export function useNotifications(userId: string | null) {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          console.log('[TeleZeta] New notification:', payload);
+          log('[TeleZeta] New notification:', payload);
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev]);
           setUnreadCount((prev) => prev + 1);
@@ -94,7 +95,7 @@ export function useNotifications(userId: string | null) {
         );
         setUnreadCount((prev) => Math.max(0, prev - 1));
       } catch (err) {
-        console.log('[TeleZeta] Mark as read failed:', err);
+        log('[TeleZeta] Mark as read failed:', err);
       }
     },
     [supabase]
@@ -114,7 +115,7 @@ export function useNotifications(userId: string | null) {
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (err) {
-      console.log('[TeleZeta] Mark all as read failed:', err);
+      log('[TeleZeta] Mark all as read failed:', err);
     }
   }, [userId, supabase]);
 

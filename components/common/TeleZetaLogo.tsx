@@ -9,6 +9,7 @@ interface TeleZetaLogoProps {
   variant?: 'dark' | 'light' | 'auto';
   size?: 'sm' | 'md' | 'lg';
   showText?: boolean;
+  priority?: boolean;
 }
 
 const sizes = {
@@ -53,7 +54,7 @@ function LogoSVG({ variant, size }: { variant: 'dark' | 'light'; size: 'sm' | 'm
   );
 }
 
-export default function TeleZetaLogo({ variant = 'auto', size = 'md', showText = true }: TeleZetaLogoProps) {
+export default function TeleZetaLogo({ variant = 'auto', size = 'md', showText = true, priority = false }: TeleZetaLogoProps) {
   const [imgError, setImgError] = useState(false);
   const resolvedVariant = variant === 'auto' ? 'dark' : variant;
   const { height, width } = sizes[size];
@@ -69,12 +70,12 @@ export default function TeleZetaLogo({ variant = 'auto', size = 'md', showText =
     <div className="flex items-center gap-2 animate-float">
       <Image
         src={imgSrc}
-        alt="TeleZeta Logo"
+        alt="TeleZeta"
         width={showText ? width * 2.5 : width}
         height={height}
         style={{ height: height, width: 'auto', objectFit: 'contain' }}
         onError={() => setImgError(true)}
-        priority
+        priority={priority}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Write Medical Record & Prescription
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,10 +9,11 @@ import * as z from 'zod';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Avatar from '@/components/common/Avatar';
-import { Skeleton } from '@/components/common/LoadingSkeleton';
+import { Skeleton, PageSkeleton } from '@/components/common/LoadingSkeleton';
 import { formatTime } from '@/lib/utils/formatters';
 import { FileText, Plus, Trash2, Save, Pill, User, AlertCircle, CheckCircle2, Search, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import Link from 'next/link';import { log, logError } from '@/lib/utils/logger';
+
 
 // Schema
 const medicationSchema = z.object({
@@ -31,14 +32,14 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function WriteRecord() {
+function WriteRecordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get('appointment_id');
   const patientId = searchParams.get('patient_id'); // Optional, to find their latest ap
   
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [appointment, setAppointment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -97,8 +98,8 @@ export default function WriteRecord() {
         }
 
         setAppointment(data);
-      } catch (err: any) {
-        console.error('[TeleZeta] Failed to load data:', err);
+      } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
+        logError('[TeleZeta] Failed to load data:', err);
         setErrorMsg(err.message || 'Gagal memuat detail pasien.');
       } finally {
         setLoading(false);
@@ -172,7 +173,7 @@ export default function WriteRecord() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
     } catch (err) {
-      console.error('[TeleZeta] Failed to save record:', err);
+      logError('[TeleZeta] Failed to save record:', err);
       alert('Terjadi kesalahan saat menyimpan rekam medis.');
     } finally {
       setIsSubmitting(false);
@@ -365,7 +366,7 @@ export default function WriteRecord() {
                           <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nama Obat / Merek</label>
                           <input
                             type="text"
-                            placeholder="Cth: Paracetamol 500mg"
+                            placeholder="Contoh: &quot;Amlodipine 5mg&quot; atau &quot;Paracetamol 500mg&quot;"
                             className={`w-full px-3 py-2 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.medications?.[index]?.name ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 focus:bg-white'}`}
                             {...register(`medications.${index}.name`)}
                           />
@@ -455,5 +456,13 @@ export default function WriteRecord() {
       ) : null}
 
     </div>
+  );
+}
+
+export default function WriteRecord() {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <WriteRecordContent />
+    </Suspense>
   );
 }

@@ -9,7 +9,8 @@ import StatCard from '@/components/common/StatCard';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { formatTime } from '@/lib/utils/formatters';
-import { ArrowRight, Package, Store, Clock, CheckCircle2, TrendingUp, AlertCircle, Search } from 'lucide-react';
+import { ArrowRight, Package, Store, Clock, CheckCircle2, TrendingUp, AlertCircle, Search } from 'lucide-react';import { log, logError } from '@/lib/utils/logger';
+
 
 export default function PharmacistDashboard() {
   const { user, profile } = useAuth();
@@ -61,7 +62,7 @@ export default function PharmacistDashboard() {
         setStats({ new: new_orders, processing: proc, ready, completed_today: comp });
 
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch pharmacist dashboard:', err);
+        logError('[TeleZeta] Failed to fetch pharmacist dashboard:', err);
         setErrorMsg('Gagal memuat data pesanan apotek. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);

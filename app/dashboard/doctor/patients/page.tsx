@@ -9,7 +9,8 @@ import type { Profile, Appointment } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
 import { User, Search, Activity, Calendar, History, ArrowRight, Users } from 'lucide-react';
-import * as Dialog from '@radix-ui/react-dialog';
+import * as Dialog from '@radix-ui/react-dialog';import { log, logError } from '@/lib/utils/logger';
+
 
 // Helper type to group patients with their latest appointment
 type PatientItem = {
@@ -64,7 +65,7 @@ export default function DoctorPatientsList() {
 
         setPatients(Array.from(patientMap.values()));
       } catch (err) {
-        console.error('[TeleZeta] Failed to fetch patients:', err);
+        logError('[TeleZeta] Failed to fetch patients:', err);
       } finally {
         setLoading(false);
       }

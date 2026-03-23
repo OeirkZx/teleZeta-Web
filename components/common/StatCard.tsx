@@ -20,7 +20,6 @@ export default function StatCard({ emoji, label, value, delay = 0, trend }: Stat
     const prefersReducedMotion = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
 
     if (prefersReducedMotion) {
-      setDisplayValue(value);
       return;
     }
 
@@ -28,7 +27,6 @@ export default function StatCard({ emoji, label, value, delay = 0, trend }: Stat
     const rawValue = String(value);
     const numericMatch = rawValue.match(/[\d.]+/);
     if (!numericMatch) {
-      setDisplayValue(value);
       return; // Jika tidak ada angka, skip animasi
     }
     
