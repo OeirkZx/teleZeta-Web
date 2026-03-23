@@ -32,6 +32,7 @@ export default function DoctorsPage() {
   const searchParams = useSearchParams();
   const preSelectedId = searchParams.get('selected');
   const { user, profile } = useAuth();
+  // Call createClient but we don't need it in deps since it's used inside
   const supabase = createClient();
 
   const [doctors, setDoctors] = useState<DoctorWithProfile[]>([]);
@@ -70,7 +71,8 @@ export default function DoctorsPage() {
     }
 
     fetchDoctors();
-  }, [supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle pre-selected doctor from dashboard home
   useEffect(() => {
