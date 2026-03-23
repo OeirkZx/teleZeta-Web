@@ -48,9 +48,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <h2 className="text-2xl font-bold text-gray-900">Sesi Tidak Valid</h2>
         <p className="text-gray-500 max-w-sm mb-4">{error || (timedOut ? 'Koneksi timeout, silakan coba lagi.' : 'Silakan login kembali untuk melanjutkan sesi Anda.')}</p>
         <button 
-          className="px-6 py-3 rounded-xl font-bold text-white shadow-sm transition-transform hover:-translate-y-0.5"
+          className="px-6 py-3 rounded-xl font-bold text-white shadow-sm transition-transform hover:-translate-y-0.5 relative z-10 cursor-pointer"
           style={{ background: 'var(--blue-accent)' }}
-          onClick={signOut}
+          onClick={() => {
+            signOut();
+            // Fail-safe redirect for Android webview
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 300);
+          }}
         >
           Kembali ke Login
         </button>

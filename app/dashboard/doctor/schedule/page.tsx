@@ -77,6 +77,7 @@ export default function DoctorSchedule() {
             ? `Dr. ${profile?.full_name || 'Dokter'} telah mengkonfirmasi jadwal konsultasi Anda. Sampai jumpa!`
             : `Maaf, Dr. ${profile?.full_name || 'Dokter'} tidak dapat menerima jadwal konsultasi Anda. Silakan pilih jadwal lain.`,
           type: 'appointment',
+          target_url: '/dashboard/patient/appointments',
           is_read: false,
         });
       }

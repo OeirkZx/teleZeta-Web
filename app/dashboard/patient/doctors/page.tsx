@@ -138,6 +138,7 @@ function DoctorsPageContent() {
           })
         } pukul ${selectedTime} WIB`,
         type: 'appointment',
+        target_url: '/dashboard/doctor/schedule',
         is_read: false,
       });
 
@@ -147,6 +148,7 @@ function DoctorsPageContent() {
         title: 'Janji Temu Berhasil Dibuat',
         body: `Permintaan konsultasi dengan ${bookingDoctor.profiles?.full_name} pada ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })} pukul ${selectedTime} WIB sedang menunggu konfirmasi dokter.`,
         type: 'appointment',
+        target_url: '/dashboard/patient/appointments',
         is_read: false,
       });
 

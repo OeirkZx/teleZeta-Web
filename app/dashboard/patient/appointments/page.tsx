@@ -85,6 +85,7 @@ export default function PatientAppointments() {
           title: 'Janji Temu Dibatalkan',
           body: `Pasien telah membatalkan janji konsultasi yang dijadwalkan.`,
           type: 'appointment',
+          target_url: '/dashboard/doctor/schedule',
           is_read: false,
         });
       }
