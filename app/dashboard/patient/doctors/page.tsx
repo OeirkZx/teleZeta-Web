@@ -31,7 +31,7 @@ export default function DoctorsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preSelectedId = searchParams.get('selected');
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const supabase = createClient();
 
   const [doctors, setDoctors] = useState<DoctorWithProfile[]>([]);
@@ -125,6 +125,28 @@ export default function DoctorsPage() {
       }).select().single();
 
       if (error) throw error;
+
+      // Kirim notifikasi ke dokter
+      await supabase.from('notifications').insert({
+        user_id: bookingDoctor.id,
+        title: 'Permintaan Konsultasi Baru',
+        body: `${profile?.full_name || 'Pasien'} ingin konsultasi pada ${
+          selectedDate.toLocaleDateString('id-ID', { 
+            day: 'numeric', month: 'long', year: 'numeric' 
+          })
+        } pukul ${selectedTime} WIB`,
+        type: 'appointment',
+        is_read: false,
+      });
+
+      // Kirim notifikasi konfirmasi ke pasien
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: 'Janji Temu Berhasil Dibuat',
+        body: `Permintaan konsultasi dengan ${bookingDoctor.profiles?.full_name} pada ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })} pukul ${selectedTime} WIB sedang menunggu konfirmasi dokter.`,
+        type: 'appointment',
+        is_read: false,
+      });
 
       // Success
       setBookingStep(4); // Show success view

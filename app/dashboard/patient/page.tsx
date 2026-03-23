@@ -1,4 +1,4 @@
-// [TeleZeta] Patient Home Dashboard
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { MOCK_APPOINTMENTS, MOCK_DOCTORS, MOCK_MEDICAL_RECORDS, MOCK_PRESCRIPTIONS } from '@/lib/types';
@@ -84,7 +84,7 @@ async function getDashboardData() {
       profile: { full_name: 'Pengguna' },
       todayAppointment: null,
       stats: { consultations: 0, records: 0, prescriptions: 0 },
-      onlineDoctors: MOCK_DOCTORS.slice(0, 2),
+      onlineDoctors: [],
     };
   }
 }

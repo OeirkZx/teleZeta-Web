@@ -77,8 +77,19 @@ export function useRealtimeChat(appointmentId: string | null) {
   const sendMessage = useCallback(
     async (content: string, senderId: string) => {
       if (!appointmentId || !content.trim()) return;
-
       try {
+        const newMsg = {
+          id: crypto.randomUUID(),
+          appointment_id: appointmentId,
+          sender_id: senderId,
+          content: content.trim(),
+          created_at: new Date().toISOString(),
+          sender: null,
+        };
+        
+        // Optimistic update — tampilkan dulu di UI
+        setMessages(prev => [...prev, newMsg as any]);
+        
         const { error } = await supabase.from('messages').insert({
           appointment_id: appointmentId,
           sender_id: senderId,
@@ -86,7 +97,8 @@ export function useRealtimeChat(appointmentId: string | null) {
         });
 
         if (error) {
-          console.log('[TeleZeta] Error sending message:', error.message);
+          // Rollback optimistic update jika gagal
+          setMessages(prev => prev.filter(m => m.id !== newMsg.id));
           throw error;
         }
       } catch (err) {

@@ -74,6 +74,18 @@ export default function PatientAppointments() {
       setAppointments(prev => prev.map(app => 
         app.id === id ? { ...app, status: 'cancelled' } : app
       ));
+
+      // Send notification to doctor
+      const cancelledApp = appointments.find(a => a.id === id);
+      if (cancelledApp) {
+        await supabase.from('notifications').insert({
+          user_id: cancelledApp.doctor?.id || cancelledApp.doctor_id,
+          title: 'Janji Temu Dibatalkan',
+          body: `Pasien telah membatalkan janji konsultasi yang dijadwalkan.`,
+          type: 'appointment',
+          is_read: false,
+        });
+      }
     } catch (err) {
       console.error('[TeleZeta] Failed to cancel appointment:', err);
       alert('Gagal membatalkan jadwal. Silakan coba lagi.');
@@ -162,7 +174,7 @@ export default function PatientAppointments() {
 
           {/* Actions */}
           <div className="flex flex-row md:flex-col items-center justify-end gap-3 mt-4 md:mt-0 shrink-0 border-t md:border-t-0 border-gray-100 pt-4 md:pt-0">
-            {(app.status === 'confirmed' || app.status === 'ongoing') ? (
+            {(app.status === 'confirmed' || app.status === 'ongoing') && (
               <Link
                 href={`/consultation/${app.id}`}
                 className="w-full md:w-auto px-6 py-2.5 rounded-xl font-bold text-white shadow-sm flex items-center justify-center transition-transform hover:-translate-y-0.5 btn-ripple text-sm"
@@ -170,7 +182,9 @@ export default function PatientAppointments() {
               >
                 Mulai {app.consultation_type === 'video' ? 'Video' : 'Chat'} <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
-            ) : app.status === 'pending' ? (
+            )}
+            
+            {(app.status === 'pending' || app.status === 'confirmed') && (
               <button
                 onClick={() => handleCancel(app.id)}
                 disabled={cancelingId === app.id}
@@ -178,7 +192,9 @@ export default function PatientAppointments() {
               >
                 {cancelingId === app.id ? 'Membatalkan...' : 'Batalkan'}
               </button>
-            ) : app.status === 'completed' ? (
+            )}
+
+            {app.status === 'completed' && (
               <>
                 <Link
                   href={`/dashboard/patient/records?id=${app.id}`}
@@ -193,7 +209,7 @@ export default function PatientAppointments() {
                   <Star className="w-4 h-4 mr-2" /> Beri Ulasan
                 </button>
               </>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
