@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { createClient } from '@/lib/supabase/client';
 import { PageSkeleton } from '@/components/common/LoadingSkeleton';
 
 export default function DashboardPage() {
@@ -12,11 +13,17 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && role) {
+    if (loading) return;
+
+    if (role) {
       console.log('[TeleZeta] Redirecting to dashboard:', role);
       router.replace(`/dashboard/${role}`);
-    } else if (!loading && !role) {
-      router.replace('/login?message=Profil tidak ditemukan, silakan daftar ulang');
+    } else {
+      console.log('[TeleZeta] No role found, clearing session and routing to login');
+      const supabase = createClient();
+      supabase.auth.signOut().then(() => {
+        router.replace('/login?message=Sesi tidak valid, silakan login ulang');
+      });
     }
   }, [role, loading, router]);
 

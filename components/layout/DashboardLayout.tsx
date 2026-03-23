@@ -38,7 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button 
           className="px-6 py-3 rounded-xl font-bold text-white shadow-sm transition-transform hover:-translate-y-0.5"
           style={{ background: 'var(--blue-accent)' }}
-          onClick={() => window.location.href = '/login'}
+          onClick={signOut}
         >
           Kembali ke Login
         </button>
