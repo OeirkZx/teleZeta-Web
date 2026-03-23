@@ -121,8 +121,7 @@ function WriteRecordContent() {
           patient_id: appointment.patient_id,
           doctor_id: user.id,
           diagnosis: data.diagnosis,
-          symptoms: data.symptoms,
-          notes: data.notes || '',
+          notes: `Gejala: ${data.symptoms}\nCatatan Tambahan: ${data.notes || '-'}`,
         })
         .select()
         .single();
@@ -151,6 +150,7 @@ function WriteRecordContent() {
           dosage: med.dosage || '',
           frequency: med.frequency,
           quantity: 1,
+          refills: 0,
           instructions: med.duration || '',
         }));
 
@@ -172,9 +172,9 @@ function WriteRecordContent() {
       setSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
-    } catch (err) {
+    } catch (err: any) {
       logError('[TeleZeta] Failed to save record:', err);
-      alert('Terjadi kesalahan saat menyimpan rekam medis.');
+      alert(`Terjadi kesalahan saat menyimpan rekam medis: ${err.message || 'Error tidak diketahui'}`);
     } finally {
       setIsSubmitting(false);
     }
