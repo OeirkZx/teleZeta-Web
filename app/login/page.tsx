@@ -91,9 +91,9 @@ function LoginForm() {
         }
       }
 
-      // Refresh router to trigger middleware and redirect to correct dashboard
-      router.refresh();
-      router.push('/dashboard');
+      // Use window.location for reliable cross-platform navigation after login
+      // router.refresh() + router.push() causes race condition on Android WebKit
+      window.location.href = '/dashboard';
     } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
       setError(err.message || 'Terjadi kesalahan saat masuk');
       setIsLoading(false);

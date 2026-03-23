@@ -2,7 +2,7 @@
 // Menggabungkan Sidebar + TopBar + Content area
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -12,7 +12,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { profile, role, loading, signOut, user, error } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  if (loading) {
+  // Safety timeout — if auth takes more than 8s, stop loading
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (!loading) return;
+    const timer = setTimeout(() => setTimedOut(true), 8000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  // Treat timeout same as "no user" — show error state
+  const effectiveLoading = loading && !timedOut;
+
+  if (effectiveLoading) {
     return (
       <div className="flex h-screen" style={{ background: 'var(--bg-light)' }}>
         {/* Sidebar skeleton */}
@@ -25,7 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  if (error || (!loading && !user)) {
+  if (error || timedOut || (!effectiveLoading && !user)) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50 flex-col gap-4 text-center p-6" style={{ background: 'var(--bg-light)' }}>
         <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-2">
@@ -34,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-gray-900">Sesi Tidak Valid</h2>
-        <p className="text-gray-500 max-w-sm mb-4">{error || 'Silakan login kembali untuk melanjutkan sesi Anda.'}</p>
+        <p className="text-gray-500 max-w-sm mb-4">{error || (timedOut ? 'Koneksi timeout, silakan coba lagi.' : 'Silakan login kembali untuk melanjutkan sesi Anda.')}</p>
         <button 
           className="px-6 py-3 rounded-xl font-bold text-white shadow-sm transition-transform hover:-translate-y-0.5"
           style={{ background: 'var(--blue-accent)' }}

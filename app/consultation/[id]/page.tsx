@@ -126,7 +126,8 @@ export default function ConsultationRoom({
       if (callRef.current) {
         callRef.current.leave()
           .then(() => callRef.current?.destroy())
-          .catch(console.error);
+          .catch(() => {});
+        callRef.current = null;
       }
     };
   }, [appointment, currentUserProfile]);
@@ -142,6 +143,7 @@ export default function ConsultationRoom({
     try {
       if (callRef.current) {
         await callRef.current.leave();
+        callRef.current = null;
       }
 
       await supabase

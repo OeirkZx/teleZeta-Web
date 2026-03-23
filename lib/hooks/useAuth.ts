@@ -78,12 +78,21 @@ export function useAuth() {
       async (event, session) => {
         log('[TeleZeta] Auth event:', event);
 
-        if (event === 'SIGNED_IN' && session?.user) {
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
           const profile = await fetchProfile(session.user.id);
           setState({
             user: session.user,
             profile,
             role: profile?.role as UserRole || null,
+            loading: false,
+            error: null,
+          });
+        } else if (event === 'INITIAL_SESSION' && !session) {
+          // No session on page load — user is not logged in
+          setState({
+            user: null,
+            profile: null,
+            role: null,
             loading: false,
             error: null,
           });
