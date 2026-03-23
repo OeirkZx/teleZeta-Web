@@ -3,6 +3,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Bell, Menu } from 'lucide-react';
 import { useNotifications } from '@/lib/hooks/useNotifications';
 import { formatRelativeTime } from '@/lib/utils/formatters';
@@ -16,6 +17,7 @@ interface TopBarProps {
 }
 
 export default function TopBar({ userId, profile, onMenuClick }: TopBarProps) {
+  const router = useRouter();
   const { notifications: realNotifications, unreadCount: realUnread, markAsRead, markAllAsRead } = useNotifications(userId);
   const [showNotifs, setShowNotifs] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -128,6 +130,9 @@ export default function TopBar({ userId, profile, onMenuClick }: TopBarProps) {
                   onClick={() => {
                     if (!notif.is_read) markAsRead(notif.id);
                     setShowNotifs(false);
+                    if (notif.target_url) {
+                      router.push(notif.target_url);
+                    }
                   }}
                   className="flex gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
                   style={{

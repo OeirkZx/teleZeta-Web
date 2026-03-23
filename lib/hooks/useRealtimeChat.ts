@@ -63,7 +63,16 @@ export function useRealtimeChat(appointmentId: string | null) {
             .eq('id', newMessage.sender_id)
             .single();
 
-          setMessages((prev) => [...prev, { ...newMessage, sender }]);
+          // Deduplicate: if this message was already added by the optimistic update,
+          // replace it (to get the real DB id/created_at); otherwise append.
+          setMessages((prev) => {
+            const exists = prev.some((m) => m.id === newMessage.id);
+            if (exists) {
+              // Replace the optimistic copy with the confirmed server message
+              return prev.map((m) => m.id === newMessage.id ? { ...newMessage, sender } : m);
+            }
+            return [...prev, { ...newMessage, sender }];
+          });
         }
       )
       .subscribe();
