@@ -35,6 +35,7 @@ const NAV_ITEMS: Record<UserRole, { label: string; href: string; icon: React.Rea
     { label: 'Beranda', href: '/dashboard/doctor', icon: <Home size={20} /> },
     { label: 'Jadwal Konsultasi', href: '/dashboard/doctor/schedule', icon: <Clock size={20} /> },
     { label: 'Daftar Pasien', href: '/dashboard/doctor/patients', icon: <Users size={20} /> },
+    { label: 'Riwayat Rekam Medis', href: '/dashboard/doctor/records', icon: <ClipboardList size={20} /> },
     { label: 'Tulis Rekam Medis', href: '/dashboard/doctor/write-record', icon: <FileText size={20} /> },
     { label: 'Statistik', href: '/dashboard/doctor/stats', icon: <BarChart3 size={20} /> },
     { label: 'Profil Saya', href: '/dashboard/doctor/profile', icon: <User size={20} /> },
