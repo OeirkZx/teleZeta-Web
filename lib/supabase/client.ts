@@ -18,26 +18,5 @@ export function createClient() {
   const key = SUPABASE_ANON_KEY.length > 20 
     ? SUPABASE_ANON_KEY : FALLBACK_KEY
 
-  return createBrowserClient(url, key, {
-    auth: {
-      storageKey: 'telezeta-auth',
-      storage: typeof window !== 'undefined' ? {
-        getItem: (key: string) => {
-          try { return window.localStorage.getItem(key) } 
-          catch { return null }
-        },
-        setItem: (key: string, value: string) => {
-          try { window.localStorage.setItem(key, value) } 
-          catch {}
-        },
-        removeItem: (key: string) => {
-          try { window.localStorage.removeItem(key) } 
-          catch {}
-        },
-      } : undefined,
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-    },
-  })
+  return createBrowserClient(url, key)
 }
