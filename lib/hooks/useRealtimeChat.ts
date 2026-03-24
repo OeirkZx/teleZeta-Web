@@ -101,6 +101,7 @@ export function useRealtimeChat(appointmentId: string | null) {
         setMessages(prev => [...prev, newMsg as any]);
         
         const { error } = await supabase.from('messages').insert({
+          id: newMsg.id,
           appointment_id: appointmentId,
           sender_id: senderId,
           content: content.trim(),
