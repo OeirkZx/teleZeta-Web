@@ -4,6 +4,7 @@ import React from "react";
 import type { Metadata } from "next";
 import type { Viewport } from "next";
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { createClient } from '@/lib/supabase/server';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,11 +20,20 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let profile = null;
+  if (user) {
+    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    profile = data;
+  }
+
   return (
     <html lang="id">
       <head>
@@ -35,7 +45,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <AuthProvider>
+        <AuthProvider initialUser={user} initialProfile={profile} initialRole={profile?.role as any}>
           {children}
         </AuthProvider>
       </body>

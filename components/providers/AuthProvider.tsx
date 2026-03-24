@@ -22,12 +22,22 @@ interface AuthContextType extends AuthState {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ 
+  children,
+  initialUser = null,
+  initialProfile = null,
+  initialRole = null
+}: { 
+  children: ReactNode,
+  initialUser?: User | null,
+  initialProfile?: Profile | null,
+  initialRole?: UserRole | null
+}) {
   const [state, setState] = useState<AuthState>({
-    user: null,
-    profile: null,
-    role: null,
-    loading: true,
+    user: initialUser,
+    profile: initialProfile,
+    role: initialRole,
+    loading: false, // SSR guarantees truth on mount!
     error: null,
   });
 
@@ -53,68 +63,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        // Coba getSession dulu (baca lokal, lebih cepat)
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          const profile = await fetchProfile(session.user.id);
-          setState({
-            user: session.user,
-            profile,
-            role: profile?.role as UserRole || null,
-            loading: false,
-            error: null,
-          });
-          return;
-        }
-
-        // Fallback ke getUser() untuk validasi server-side
-        const { data: { user }, error } = await supabase.auth.getUser();
-
-        if (error || !user) {
-          setState(prev => ({ ...prev, loading: false }));
-          return;
-        }
-
-        const profile = await fetchProfile(user.id);
-
-        setState({
-          user,
-          profile,
-          role: profile?.role as UserRole || null,
-          loading: false,
-          error: null,
-        });
-      } catch (err) {
-        log('[TeleZeta] Auth error:', err);
-        setState(prev => ({ ...prev, loading: false, error: 'Gagal memuat sesi' }));
-      }
-    };
-
-    getUser();
-
-    // Listen to auth state changes
+    // Listen to real-time auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         log('[TeleZeta] Auth event:', event);
+        
+        // Skip INITIAL_SESSION since SSR already provided the exact initial state
+        if (event === 'INITIAL_SESSION') return;
 
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
+        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
           const profile = await fetchProfile(session.user.id);
           setState({
             user: session.user,
             profile,
             role: profile?.role as UserRole || null,
-            loading: false,
-            error: null,
-          });
-        } else if (event === 'INITIAL_SESSION' && !session) {
-          // No session on page load — user is not logged in
-          setState({
-            user: null,
-            profile: null,
-            role: null,
             loading: false,
             error: null,
           });
