@@ -49,6 +49,22 @@ export function useAuth() {
   useEffect(() => {
     const getUser = async () => {
       try {
+        // Coba getSession dulu (baca lokal, lebih cepat)
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          const profile = await fetchProfile(session.user.id);
+          setState({
+            user: session.user,
+            profile,
+            role: profile?.role as UserRole || null,
+            loading: false,
+            error: null,
+          });
+          return;
+        }
+
+        // Fallback ke getUser() untuk validasi server-side
         const { data: { user }, error } = await supabase.auth.getUser();
 
         if (error || !user) {

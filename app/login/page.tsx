@@ -76,7 +76,7 @@ function LoginForm() {
       setIsLoading(true);
       setError(null);
 
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
@@ -91,9 +91,16 @@ function LoginForm() {
         }
       }
 
-      // Use window.location for reliable cross-platform navigation after login
-      // router.refresh() + router.push() causes race condition on Android WebKit
-      window.location.href = '/dashboard';
+      if (!authData.session) {
+        throw new Error('Gagal membuat sesi. Silakan coba lagi.');
+      }
+
+      // Tunggu session benar-benar tersimpan sebelum navigasi
+      // Ini penting untuk Android yang lebih lambat handle storage
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Gunakan replace agar tidak bisa back ke login
+      window.location.replace('/dashboard');
     } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
       setError(err.message || 'Terjadi kesalahan saat masuk');
       setIsLoading(false);

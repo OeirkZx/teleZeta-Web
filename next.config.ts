@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  reactCompiler: true,
+  // reactCompiler dihapus - masih experimental, 
+  // menyebabkan auth timing bug di Android
 };
 
 export default nextConfig;

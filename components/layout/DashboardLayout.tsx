@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     if (!loading) return;
-    const timer = setTimeout(() => setTimedOut(true), 8000);
+    const timer = setTimeout(() => setTimedOut(true), 20000);
     return () => clearTimeout(timer);
   }, [loading]);
 
