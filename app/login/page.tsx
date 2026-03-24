@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClient } from '@/lib/supabase/client';
+import { loginWithEmail } from '@/app/auth/actions';
 import { loginSchema, type LoginFormData } from '@/lib/utils/validators';
 import TeleZetaLogo from '@/components/common/TeleZetaLogo';
 import { Mail, Lock, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
@@ -76,29 +77,12 @@ function LoginForm() {
       setIsLoading(true);
       setError(null);
 
-      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
+      const result = await loginWithEmail(data.email, data.password);
 
-      if (signInError) {
-        if (signInError.message.includes('Invalid login credentials')) {
-          throw new Error('Email atau password yang Anda masukkan salah');
-        } else if (signInError.message.includes('Email not confirmed')) {
-          throw new Error('Akun Anda belum dikonfirmasi, hubungi administrator');
-        } else {
-          throw new Error('Terjadi kesalahan, silakan coba lagi');
-        }
+      if (result.error) {
+        throw new Error(result.error);
       }
 
-      if (!authData.session) {
-        throw new Error('Gagal membuat sesi. Silakan coba lagi.');
-      }
-
-      // Tunggu session benar-benar tersimpan sebelum navigasi
-      // Ini penting untuk Android yang lebih lambat handle storage
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
       // Gunakan replace agar tidak bisa back ke login
       window.location.replace('/dashboard');
     } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {

@@ -5,7 +5,9 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile, UserRole } from '@/lib/types';
-import type { User } from '@supabase/supabase-js';import { log, logError } from '@/lib/utils/logger';
+import type { User } from '@supabase/supabase-js';
+import { log, logError } from '@/lib/utils/logger';
+import { logoutUser } from '@/app/auth/actions';
 
 
 interface AuthState {
@@ -134,11 +136,14 @@ export function useAuth() {
       // Set loading state dulu agar UI memberikan feedback
       setState(prev => ({ ...prev, loading: true }));
       
-      // Panggil signOut dari Supabase
-      const { error } = await supabase.auth.signOut();
+      // Clear browser local storage / cookie config reliably
+      await supabase.auth.signOut();
       
-      if (error) {
-        logError('[TeleZeta] Sign out error:', error);
+      // Clear server-side JWT cookie using Server Action
+      const result = await logoutUser();
+      
+      if (result?.error) {
+        logError('[TeleZeta] Sign out API error:', result.error);
       }
       
       // Reset state secara manual untuk memastikan
@@ -150,10 +155,6 @@ export function useAuth() {
         loading: false,
         error: null,
       });
-      
-      // Tunggu sebentar agar cookie benar-benar terhapus
-      // sebelum melakukan redirect
-      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Gunakan replace agar tidak bisa back ke halaman dashboard
       // setelah logout
