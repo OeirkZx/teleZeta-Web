@@ -137,6 +137,44 @@ export default function ConsultationRoom({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Realtime: redirect the OTHER party when someone ends the consultation
+  useEffect(() => {
+    if (!user || !role) return;
+
+    const channel = supabase
+      .channel(`consultation-end-${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'appointments',
+          filter: `id=eq.${id}`,
+        },
+        async (payload) => {
+          const updated = payload.new as { id: string; status: string };
+          if (updated.status === 'completed') {
+            // Leave any active video call
+            if (callRef.current) {
+              try { await callRef.current.leave(); } catch (_) {}
+              callRef.current = null;
+            }
+            // Redirect based on role
+            if (role === 'doctor') {
+              router.push(`/dashboard/doctor/write-record?appointment_id=${id}`);
+            } else {
+              router.push('/dashboard/patient/appointments');
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, user, role, router, supabase]);
+
   const handleEndConsultation = async () => {
     if (!confirm('Akhiri konsultasi sekarang?')) return;
     
