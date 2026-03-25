@@ -108,7 +108,7 @@ export default function DoctorRecords() {
             >
               <div className="flex items-center gap-4 mb-4">
                 <Avatar
-                  name={record.patient?.full_name || 'Pasien'}
+                  name={record.patient?.full_name || ''}
                   src={record.patient?.avatar_url}
                   size={48}
                 />
@@ -181,7 +181,7 @@ export default function DoctorRecords() {
               <div className="flex flex-wrap gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar
-                    name={selectedRecord?.patient?.full_name || 'Pasien Anonim'}
+                    name={selectedRecord?.patient?.full_name || ''}
                     src={selectedRecord?.patient?.avatar_url}
                     size={48}
                   />
