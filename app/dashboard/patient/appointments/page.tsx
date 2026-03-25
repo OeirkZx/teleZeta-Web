@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { MOCK_APPOINTMENTS } from '@/lib/types';
-import type { Appointment, Doctor, Profile } from '@/lib/types';
+import type { Appointment, AppointmentStatus, Doctor, Profile } from '@/lib/types';
 import Avatar from '@/components/common/Avatar';
 import Badge from '@/components/common/Badge';
 import { Skeleton } from '@/components/common/LoadingSkeleton';
@@ -58,6 +58,36 @@ export default function PatientAppointments() {
     }
 
     fetchAppointments();
+  }, [user, supabase]);
+
+  // Realtime subscription: update status badge automatically when doctor confirms/rejects
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`patient-appointments-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'appointments',
+          filter: `patient_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const updated = payload.new as { id: string; status: AppointmentStatus };
+          setAppointments(prev =>
+            prev.map(app =>
+              app.id === updated.id ? { ...app, status: updated.status } : app
+            )
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, supabase]);
 
   const handleCancel = async (id: string) => {
