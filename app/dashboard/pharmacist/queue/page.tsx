@@ -1,7 +1,7 @@
 // [TeleZeta] Pharmacist Prescription Queue Page
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Badge from '@/components/common/Badge';
@@ -17,7 +17,7 @@ type QueueFilter = 'all' | 'processing' | 'ready';
 
 export default function PharmacistQueue() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

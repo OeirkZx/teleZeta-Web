@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Patients List
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -21,7 +21,7 @@ type PatientItem = {
 
 export default function DoctorPatientsList() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   
   const [patients, setPatients] = useState<PatientItem[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Statistics Page
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import StatCard from '@/components/common/StatCard';
@@ -12,7 +12,7 @@ import * as Tabs from '@radix-ui/react-tabs';import { log, logError } from '@/li
 
 export default function DoctorStats() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({

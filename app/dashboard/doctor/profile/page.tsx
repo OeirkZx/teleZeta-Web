@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Profile Page
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,7 +29,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function DoctorProfile() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   
   const [profileData, setProfileData] = useState<any>(null);
   const [doctorData, setDoctorData] = useState<any>(null);

@@ -1,7 +1,7 @@
 // [TeleZeta] Patient Medical Records list
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -26,7 +26,7 @@ type EnrichedRecord = MedicalRecord & {
 
 export default function PatientRecords() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const searchParams = useSearchParams();
   const highlightId = searchParams.get('id'); // pre-open if came from appointments
   
@@ -73,8 +73,8 @@ export default function PatientRecords() {
     fetchRecords();
   }, [user, supabase, highlightId]);
 
-  const filteredRecords = records.filter(r => 
-    r.diagnosis.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredRecords = records.filter(r =>
+    (r.diagnosis ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.appointment?.doctor.profiles.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

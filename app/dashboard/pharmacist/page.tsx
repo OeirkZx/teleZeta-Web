@@ -1,7 +1,7 @@
 // [TeleZeta] Pharmacist Home Dashboard
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -14,7 +14,7 @@ import { ArrowRight, Package, Store, Clock, CheckCircle2, TrendingUp, AlertCircl
 
 export default function PharmacistDashboard() {
   const { user, profile } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [pharmacistData, setPharmacistData] = useState<any>(null);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
@@ -69,8 +69,7 @@ export default function PharmacistDashboard() {
       }
     }
     fetchData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, supabase]);
 
   if (loading) {
     return (

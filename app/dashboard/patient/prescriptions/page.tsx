@@ -1,7 +1,7 @@
 // [TeleZeta] Patient Prescriptions Page
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { MOCK_PRESCRIPTIONS } from '@/lib/types';
@@ -21,7 +21,7 @@ type EnrichedPrescription = Prescription & {
 
 export default function PatientPrescriptions() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   
   const [prescriptions, setPrescriptions] = useState<EnrichedPrescription[]>([]);
   const [loading, setLoading] = useState(true);

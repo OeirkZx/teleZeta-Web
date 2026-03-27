@@ -1,7 +1,7 @@
 // [TeleZeta] Pharmacist Inventory Management Page
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClient } from '@/lib/supabase/client';
@@ -19,7 +19,7 @@ import * as Dialog from '@radix-ui/react-dialog';import { log, logError } from '
 
 export default function PharmacistInventory() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
