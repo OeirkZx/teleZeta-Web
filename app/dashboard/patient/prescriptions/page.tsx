@@ -33,7 +33,7 @@ export default function PatientPrescriptions() {
   useEffect(() => {
     async function fetchPrescriptions() {
       if (!user) {
-        // Tampilkan mock data saat user belum tersedia
+        // Demo mode: tampilkan mock data untuk preview tanpa login
         setPrescriptions(MOCK_PRESCRIPTIONS as unknown as EnrichedPrescription[]);
         setLoading(false);
         return;
@@ -51,14 +51,13 @@ export default function PatientPrescriptions() {
 
         if (error) throw error;
 
-        // Gunakan mock data jika database kosong
-        const result = (data && data.length > 0) ? data : MOCK_PRESCRIPTIONS;
-        setPrescriptions(result as any[]);
+        // User sudah login: tampilkan data real (bisa kosong — itu wajar)
+        setPrescriptions((data ?? []) as any[]);
       } catch (err) {
         logError('[TeleZeta] Failed to fetch prescriptions:', err);
-        // Fallback ke mock data
+        // Fallback ke mock data hanya saat terjadi error koneksi
         setPrescriptions(MOCK_PRESCRIPTIONS as unknown as EnrichedPrescription[]);
-        setErrorMsg('Gagal memuat resep. Silakan muat ulang halaman.');
+        setErrorMsg('Gagal memuat resep. Menampilkan data contoh.');
       } finally {
         setLoading(false);
       }

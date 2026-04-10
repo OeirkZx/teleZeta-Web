@@ -37,7 +37,7 @@ export default function PatientAppointments() {
   useEffect(() => {
     async function fetchAppointments() {
       if (!user) {
-        // Tampilkan mock data saat user belum tersedia
+        // Demo mode: tampilkan mock data untuk preview tanpa login
         setAppointments(MOCK_APPOINTMENTS as unknown as AppointmentWithDoctor[]);
         setLoading(false);
         return;
@@ -52,15 +52,14 @@ export default function PatientAppointments() {
 
         if (error) throw error;
 
-        // Gunakan mock data jika database kosong
-        const result = (data && data.length > 0) ? data : MOCK_APPOINTMENTS;
-        setAppointments(result as unknown as AppointmentWithDoctor[]);
+        // User sudah login: tampilkan data real (bisa kosong — itu wajar)
+        setAppointments((data ?? []) as unknown as AppointmentWithDoctor[]);
         
       } catch (err) {
         logError('[TeleZeta] Failed to fetch appointments:', err);
-        // Fallback ke mock data
+        // Fallback ke mock data hanya saat terjadi error koneksi
         setAppointments(MOCK_APPOINTMENTS as unknown as AppointmentWithDoctor[]);
-        setErrorMsg('Gagal memuat jadwal. Silakan muat ulang halaman.');
+        setErrorMsg('Gagal memuat jadwal. Menampilkan data contoh.');
       } finally {
         setLoading(false);
       }

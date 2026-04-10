@@ -39,7 +39,7 @@ export default function PatientRecords() {
   useEffect(() => {
     async function fetchRecords() {
       if (!user) {
-        // Tampilkan mock data saat user belum login atau tidak ada
+        // Demo mode: tampilkan mock data untuk preview tanpa login
         setRecords(MOCK_MEDICAL_RECORDS as any[]);
         setLoading(false);
         return;
@@ -62,19 +62,19 @@ export default function PatientRecords() {
 
         if (error) throw error;
 
-        // Gunakan mock data jika database kosong
-        const result = (data && data.length > 0) ? data : MOCK_MEDICAL_RECORDS;
-        setRecords(result as any[]);
+        // User sudah login: tampilkan data real (bisa kosong — itu wajar)
+        setRecords((data ?? []) as any[]);
         
         // Auto open if highlighted
-        if (highlightId && result) {
-          const found = result.find(r => (r as any).appointment_id === highlightId);
+        if (highlightId && data && data.length > 0) {
+          const found = data.find(r => (r as any).appointment_id === highlightId);
           if (found) setSelectedRecord(found as any);
         }
       } catch (err) {
         logError('[TeleZeta] Failed to fetch medical records:', err);
-        // Fallback ke mock data saat error
+        // Fallback ke mock data hanya saat terjadi error koneksi
         setRecords(MOCK_MEDICAL_RECORDS as any[]);
+        setErrorMsg('Gagal memuat riwayat rekam medis. Menampilkan data contoh.');
       } finally {
         setLoading(false);
       }
