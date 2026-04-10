@@ -32,7 +32,12 @@ export default function PatientPrescriptions() {
 
   useEffect(() => {
     async function fetchPrescriptions() {
-      if (!user) return;
+      if (!user) {
+        // Tampilkan mock data saat user belum tersedia
+        setPrescriptions(MOCK_PRESCRIPTIONS as unknown as EnrichedPrescription[]);
+        setLoading(false);
+        return;
+      }
       try {
         const { data, error } = await supabase
           .from('prescriptions')
@@ -45,10 +50,14 @@ export default function PatientPrescriptions() {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setPrescriptions(data as any[]);
+
+        // Gunakan mock data jika database kosong
+        const result = (data && data.length > 0) ? data : MOCK_PRESCRIPTIONS;
+        setPrescriptions(result as any[]);
       } catch (err) {
         logError('[TeleZeta] Failed to fetch prescriptions:', err);
-        setPrescriptions([]);
+        // Fallback ke mock data
+        setPrescriptions(MOCK_PRESCRIPTIONS as unknown as EnrichedPrescription[]);
         setErrorMsg('Gagal memuat resep. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);

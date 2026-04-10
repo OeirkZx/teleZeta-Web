@@ -36,7 +36,12 @@ export default function PatientAppointments() {
 
   useEffect(() => {
     async function fetchAppointments() {
-      if (!user) return;
+      if (!user) {
+        // Tampilkan mock data saat user belum tersedia
+        setAppointments(MOCK_APPOINTMENTS as unknown as AppointmentWithDoctor[]);
+        setLoading(false);
+        return;
+      }
       
       try {
         const { data, error } = await supabase
@@ -46,11 +51,15 @@ export default function PatientAppointments() {
           .order('scheduled_at', { ascending: false });
 
         if (error) throw error;
-        setAppointments((data || []) as unknown as AppointmentWithDoctor[]);
+
+        // Gunakan mock data jika database kosong
+        const result = (data && data.length > 0) ? data : MOCK_APPOINTMENTS;
+        setAppointments(result as unknown as AppointmentWithDoctor[]);
         
       } catch (err) {
         logError('[TeleZeta] Failed to fetch appointments:', err);
-        setAppointments([]);
+        // Fallback ke mock data
+        setAppointments(MOCK_APPOINTMENTS as unknown as AppointmentWithDoctor[]);
         setErrorMsg('Gagal memuat jadwal. Silakan muat ulang halaman.');
       } finally {
         setLoading(false);

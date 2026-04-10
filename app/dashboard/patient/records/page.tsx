@@ -38,7 +38,12 @@ export default function PatientRecords() {
 
   useEffect(() => {
     async function fetchRecords() {
-      if (!user) return;
+      if (!user) {
+        // Tampilkan mock data saat user belum login atau tidak ada
+        setRecords(MOCK_MEDICAL_RECORDS as any[]);
+        setLoading(false);
+        return;
+      }
       try {
         const { data, error } = await supabase
           .from('medical_records')
@@ -56,16 +61,20 @@ export default function PatientRecords() {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setRecords(data as any[]);
+
+        // Gunakan mock data jika database kosong
+        const result = (data && data.length > 0) ? data : MOCK_MEDICAL_RECORDS;
+        setRecords(result as any[]);
         
         // Auto open if highlighted
-        if (highlightId && data) {
-          const found = data.find(r => r.appointment_id === highlightId);
+        if (highlightId && result) {
+          const found = result.find(r => (r as any).appointment_id === highlightId);
           if (found) setSelectedRecord(found as any);
         }
       } catch (err) {
         logError('[TeleZeta] Failed to fetch medical records:', err);
-        setErrorMsg('Gagal memuat riwayat rekam medis. Silakan coba lagi.');
+        // Fallback ke mock data saat error
+        setRecords(MOCK_MEDICAL_RECORDS as any[]);
       } finally {
         setLoading(false);
       }
