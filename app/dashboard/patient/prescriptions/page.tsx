@@ -39,15 +39,25 @@ export default function PatientPrescriptions() {
         return;
       }
       try {
-        const { data, error } = await supabase
-          .from('prescriptions')
-          .select(`
-            *,
-            doctor:doctors (profiles (full_name)),
-            pharmacist:pharmacists (pharmacy_name)
-          `)
-          .eq('patient_id', user.id)
-          .order('created_at', { ascending: false });
+        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutPromise = new Promise<any>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
+          });
+          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
+        const { data, error } = await withTimeout(
+          supabase
+            .from('prescriptions')
+            .select(`
+              *,
+              doctor:doctors (profiles (full_name)),
+              pharmacist:pharmacists (pharmacy_name)
+            `)
+            .eq('patient_id', user.id)
+            .order('created_at', { ascending: false })
+        );
 
         if (error) throw error;
 

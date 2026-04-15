@@ -45,20 +45,31 @@ export default function PatientRecords() {
         return;
       }
       try {
-        const { data, error } = await supabase
-          .from('medical_records')
-          .select(`
-            *,
-            appointment:appointments (
-              scheduled_at,
-              doctor:doctors (
-                specialty,
-                profiles (full_name)
+        // Fallback timeout protection to prevent hanging in skeleton load
+        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutPromise = new Promise<any>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
+          });
+          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
+        const { data, error } = await withTimeout(
+          supabase
+            .from('medical_records')
+            .select(`
+              *,
+              appointment:appointments (
+                scheduled_at,
+                doctor:doctors (
+                  specialty,
+                  profiles (full_name)
+                )
               )
-            )
-          `)
-          .eq('patient_id', user.id)
-          .order('created_at', { ascending: false });
+            `)
+            .eq('patient_id', user.id)
+            .order('created_at', { ascending: false })
+        );
 
         if (error) throw error;
 
@@ -67,7 +78,7 @@ export default function PatientRecords() {
         
         // Auto open if highlighted
         if (highlightId && data && data.length > 0) {
-          const found = data.find(r => (r as any).appointment_id === highlightId);
+          const found = data.find((r: any) => r.appointment_id === highlightId);
           if (found) setSelectedRecord(found as any);
         }
       } catch (err) {
@@ -82,7 +93,7 @@ export default function PatientRecords() {
     fetchRecords();
   }, [user, supabase, highlightId]);
 
-  const filteredRecords = records.filter(r =>
+  const filteredRecords = records.filter((r: EnrichedRecord) =>
     (r.diagnosis ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.appointment?.doctor.profiles.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
