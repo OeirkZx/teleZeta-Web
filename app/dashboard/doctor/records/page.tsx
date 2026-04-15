@@ -36,22 +36,32 @@ export default function DoctorRecords() {
     async function fetchRecords() {
       if (!user) return;
       try {
-        const { data, error } = await supabase
-          .from('medical_records')
-          .select(`
-            *,
-            patient:profiles!patient_id (*),
-            appointment:appointments (scheduled_at)
-          `)
-          .eq('doctor_id', user.id)
-          .order('created_at', { ascending: false });
+        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutPromise = new Promise<any>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
+          });
+          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
+        const { data, error } = await withTimeout(
+          supabase
+            .from('medical_records')
+            .select(`
+              *,
+              patient:profiles!patient_id (*),
+              appointment:appointments (scheduled_at)
+            `)
+            .eq('doctor_id', user.id)
+            .order('created_at', { ascending: false })
+        );
 
         if (error) throw error;
         setRecords((data ?? []) as unknown as EnrichedRecord[]);
         
         // Auto open if highlighted
         if (highlightId && data) {
-          const found = data.find(r => r.appointment_id === highlightId);
+          const found = data.find((r: any) => r.appointment_id === highlightId);
           if (found) setSelectedRecord(found as unknown as EnrichedRecord);
         }
       } catch (err) {
@@ -63,7 +73,7 @@ export default function DoctorRecords() {
     fetchRecords().catch(console.error);
   }, [user, supabase, highlightId]);
 
-  const filteredRecords = records.filter(r =>
+  const filteredRecords = records.filter((r: EnrichedRecord) =>
     (r.diagnosis ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.patient?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );

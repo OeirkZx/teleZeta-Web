@@ -31,12 +31,22 @@ export default function DoctorDashboard() {
     async function fetchData() {
       if (!user) return;
       try {
+        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutPromise = new Promise<any>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
+          });
+          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
         // Get doctor profile
-        const { data: doc } = await supabase
-          .from('doctors')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+        const { data: doc } = await withTimeout(
+          supabase
+            .from('doctors')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+        );
         
         setDoctorData(doc);
 
@@ -46,19 +56,21 @@ export default function DoctorDashboard() {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const { data: apps } = await supabase
-          .from('appointments')
-          .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url)')
-          .eq('doctor_id', user.id)
-          .gte('scheduled_at', today.toISOString())
-          .lt('scheduled_at', tomorrow.toISOString())
-          .order('scheduled_at', { ascending: true });
+        const { data: apps } = await withTimeout(
+          supabase
+            .from('appointments')
+            .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url)')
+            .eq('doctor_id', user.id)
+            .gte('scheduled_at', today.toISOString())
+            .lt('scheduled_at', tomorrow.toISOString())
+            .order('scheduled_at', { ascending: true })
+        );
 
         setAppointments(apps || []);
 
         // Stats calculation
-        const pending = apps?.filter(a => a.status === 'pending' || a.status === 'confirmed').length || 0;
-        const completed = apps?.filter(a => a.status === 'completed').length || 0;
+        const pending = apps?.filter((a: any) => a.status === 'pending' || a.status === 'confirmed').length || 0;
+        const completed = apps?.filter((a: any) => a.status === 'completed').length || 0;
 
         // Total unique patients this month
         const startOfMonth = new Date();

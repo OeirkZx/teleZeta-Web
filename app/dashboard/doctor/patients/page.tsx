@@ -34,12 +34,22 @@ export default function DoctorPatientsList() {
     async function fetchPatients() {
       if (!user) return;
       try {
+        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutPromise = new Promise<any>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
+          });
+          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
         // Query appointments for this doctor to get unique patients
-        const { data, error } = await supabase
-          .from('appointments')
-          .select('*, patient:profiles!patient_id(*)')
-          .eq('doctor_id', user.id)
-          .order('scheduled_at', { ascending: false });
+        const { data, error } = await withTimeout(
+          supabase
+            .from('appointments')
+            .select('*, patient:profiles!patient_id(*)')
+            .eq('doctor_id', user.id)
+            .order('scheduled_at', { ascending: false })
+        );
 
         if (error) throw error;
         

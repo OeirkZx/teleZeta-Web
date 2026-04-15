@@ -84,15 +84,25 @@ function WriteRecordContent() {
           return;
         }
 
-        const { data, error } = await query.single();
+        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutPromise = new Promise<any>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
+          });
+          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
+        const { data, error } = await withTimeout(query.single());
         if (error || !data) throw error || new Error("Data konsultasi tidak ditemukan.");
         
         // Cek apakah sudah ada rekam medis untuk appointment ini
-        const { data: existingRecord } = await supabase
-          .from('medical_records')
-          .select('id')
-          .eq('appointment_id', data.id)
-          .single();
+        const { data: existingRecord } = await withTimeout(
+          supabase
+            .from('medical_records')
+            .select('id')
+            .eq('appointment_id', data.id)
+            .single()
+        );
           
         if (existingRecord) {
           setErrorMsg("Rekam medis untuk sesi konsultasi ini sudah pernah diisi.");

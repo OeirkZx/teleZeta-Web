@@ -31,10 +31,20 @@ export default function DoctorStats() {
     async function fetchStats() {
       if (!user) return;
       try {
-        const { data: apps, error } = await supabase
-          .from('appointments')
-          .select('status, scheduled_at, patient_id')
-          .eq('doctor_id', user.id);
+        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutPromise = new Promise<any>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
+          });
+          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
+        const { data: apps, error } = await withTimeout(
+          supabase
+            .from('appointments')
+            .select('status, scheduled_at, patient_id')
+            .eq('doctor_id', user.id)
+        );
 
         if (error) throw error;
 
@@ -51,7 +61,7 @@ export default function DoctorStats() {
           return { month: d.toLocaleDateString('id-ID', { month: 'short' }), count: 0 };
         });
 
-        (apps || []).forEach(app => {
+        (apps || []).forEach((app: any) => {
           patients.add(app.patient_id);
           if (app.status === 'completed') completed++;
           if (app.status === 'pending' || app.status === 'confirmed' || app.status === 'ongoing') pending++;
