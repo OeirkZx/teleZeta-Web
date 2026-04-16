@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Statistics Page
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import StatCard from '@/components/common/StatCard';
@@ -14,7 +14,8 @@ export default function DoctorStats() {
   const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalAll: 0,
     totalCompleted: 0,
@@ -30,6 +31,8 @@ export default function DoctorStats() {
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchStats() {
       setLoading(true);

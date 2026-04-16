@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Patients List
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -24,7 +24,8 @@ export default function DoctorPatientsList() {
   const supabase = useMemo(() => createClient(), []);
   
   const [patients, setPatients] = useState<PatientItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Selected patient for viewing basic info dialog
@@ -33,6 +34,8 @@ export default function DoctorPatientsList() {
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchPatients() {
       setLoading(true);

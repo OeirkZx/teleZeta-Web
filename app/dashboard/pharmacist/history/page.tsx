@@ -1,7 +1,7 @@
 // [TeleZeta] Pharmacist Prescription History Page
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Badge from '@/components/common/Badge';
@@ -18,7 +18,7 @@ export default function PharmacistHistory() {
   const supabase = useMemo(() => createClient(), []);
 
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [expandedId, setExpandedId] = useState<string | null>(null);

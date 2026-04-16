@@ -1,7 +1,7 @@
 // [TeleZeta] Patient Prescriptions Page
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { MOCK_PRESCRIPTIONS } from '@/lib/types';
@@ -24,7 +24,8 @@ export default function PatientPrescriptions() {
   const supabase = useMemo(() => createClient(), []);
   
   const [prescriptions, setPrescriptions] = useState<EnrichedPrescription[]>([]);
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedPrescription, setSelectedPrescription] = useState<EnrichedPrescription | null>(null);
@@ -33,6 +34,8 @@ export default function PatientPrescriptions() {
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchPrescriptions() {
       setLoading(true);

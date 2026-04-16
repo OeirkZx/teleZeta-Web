@@ -1,7 +1,7 @@
 // [TeleZeta] Pharmacist Prescription Queue Page
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Badge from '@/components/common/Badge';
@@ -20,7 +20,8 @@ export default function PharmacistQueue() {
   const supabase = useMemo(() => createClient(), []);
 
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<QueueFilter>('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -29,6 +30,8 @@ export default function PharmacistQueue() {
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     let subscription: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 

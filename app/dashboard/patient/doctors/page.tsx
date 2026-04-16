@@ -36,7 +36,7 @@ function DoctorsPageContent() {
   const supabase = useMemo(() => createClient(), []);
 
   const [doctors, setDoctors] = useState<DoctorWithProfile[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('Semua');
 

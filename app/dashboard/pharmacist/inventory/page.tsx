@@ -1,7 +1,7 @@
 // [TeleZeta] Pharmacist Inventory Management Page
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClient } from '@/lib/supabase/client';
@@ -22,7 +22,8 @@ export default function PharmacistInventory() {
   const supabase = useMemo(() => createClient(), []);
 
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showLowStockOnly, setShowLowStockOnly] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -43,6 +44,8 @@ export default function PharmacistInventory() {
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchInventory() {
       setLoading(true);

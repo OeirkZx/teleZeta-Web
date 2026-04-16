@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Schedule Management
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -25,12 +25,15 @@ export default function DoctorSchedule() {
   const supabase = useMemo(() => createClient(), []);
   
   const [appointments, setAppointments] = useState<AppointmentWithPatient[]>([]);
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchAppointments() {
       setLoading(true);

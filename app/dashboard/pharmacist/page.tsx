@@ -1,7 +1,7 @@
 // [TeleZeta] Pharmacist Home Dashboard
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -19,12 +19,15 @@ export default function PharmacistDashboard() {
   const [pharmacistData, setPharmacistData] = useState<any>(null);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [stats, setStats] = useState({ new: 0, processing: 0, ready: 0, completed_today: 0 });
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchData() {
       setLoading(true);

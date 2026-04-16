@@ -1,7 +1,7 @@
 // [TeleZeta] Patient Appointments Page
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -24,7 +24,8 @@ export default function PatientAppointments() {
   const supabase = useMemo(() => createClient(), []);
   
   const [appointments, setAppointments] = useState<AppointmentWithDoctor[]>([]);
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -37,6 +38,8 @@ export default function PatientAppointments() {
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchAppointments() {
       setLoading(true);

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
+import { createContext, useEffect, useState, useCallback, useMemo, useRef, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile, UserRole } from '@/lib/types';
 import type { User } from '@supabase/supabase-js';
@@ -12,8 +12,9 @@ interface AuthState {
   profile: Profile | null;
   role: UserRole | null;
   loading: boolean;
-  // authReady: true ketika auth check sudah selesai.
-  // Ini mencegah halaman fetch data sebelum waktunya (race condition → double skeleton).
+  // authReady = true hanya setelah status auth PASTI diketahui.
+  // Ini adalah one-way latch: sekali true, tidak pernah kembali false.
+  // Mencegah race condition dan double-skeleton di semua halaman dashboard.
   authReady: boolean;
   error: string | null;
 }
@@ -47,6 +48,10 @@ export function AuthProvider({
     error: null,
   });
 
+  // Ref untuk mencegah authReady di-set lebih dari sekali.
+  // Penting: ini memastikan useEffect([authReady]) di halaman hanya berjalan 1x.
+  const authReadyRef = useRef(initialUser !== null);
+
   const supabase = useMemo(() => createClient(), []);
 
   const fetchProfile = useCallback(async (userId: string) => {
@@ -74,23 +79,55 @@ export function AuthProvider({
         log('[TeleZeta] Auth event:', event);
         
         if (event === 'INITIAL_SESSION') {
-          // Setelah INITIAL_SESSION, auth sudah pasti diketahui statusnya
-          // (login atau tidak). Set authReady = true agar halaman bisa fetch.
-          setState(prev => ({ ...prev, authReady: true }));
+          // INITIAL_SESSION = Supabase sudah selesai cek session lokal.
+          // Terjadi sekali di awal, bahkan jika user sudah di-set via SSR.
+          if (!authReadyRef.current) {
+            // Belum ada user dari SSR, set state dari INITIAL_SESSION.
+            authReadyRef.current = true;
+
+            if (session?.user) {
+              const profile = await fetchProfile(session.user.id);
+              setState({
+                user: session.user,
+                profile,
+                role: profile?.role as UserRole || null,
+                loading: false,
+                authReady: true,
+                error: null,
+              });
+            } else {
+              // Tidak ada session — set authReady agar halaman tahu auth sudah selesai cek
+              setState(prev => ({ ...prev, authReady: true }));
+            }
+          }
+          // Jika authReadyRef.current sudah true (user dari SSR):
+          // Tidak perlu set ulang, cukup biarkan state yang ada.
           return;
         }
 
-        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+        if (event === 'SIGNED_IN' && session?.user) {
+          // SIGNED_IN terpicu setelah INITIAL_SESSION di Vercel (normal behavior).
+          // Kita update user/profile TAPI tidak mengubah authReady.
+          // Karena authReady tidak berubah, useEffect([authReady]) di halaman
+          // TIDAK akan terpicu ulang → tidak ada re-fetch → tidak ada skeleton flash.
           const profile = await fetchProfile(session.user.id);
-          setState({
+          setState(prev => ({
+            ...prev,
             user: session.user,
             profile,
             role: profile?.role as UserRole || null,
             loading: false,
-            authReady: true,
-            error: null,
-          });
+            // authReady TIDAK diubah di sini
+          }));
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          // Token refresh: update user object saja (token baru)
+          setState(prev => ({
+            ...prev,
+            user: session.user,
+            loading: false,
+          }));
         } else if (event === 'SIGNED_OUT') {
+          authReadyRef.current = false;
           setState({
             user: null,
             profile: null,
@@ -118,6 +155,7 @@ export function AuthProvider({
         logError('[TeleZeta] Sign out API error:', result.error);
       }
       
+      authReadyRef.current = false;
       setState({
         user: null,
         profile: null,

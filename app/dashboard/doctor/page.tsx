@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Home Dashboard
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -23,13 +23,16 @@ export default function DoctorDashboard() {
   const [doctorData, setDoctorData] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [stats, setStats] = useState({ total_patients: 0, pending_appointments: 0, completed_today: 0 });
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchData() {
       setLoading(true);

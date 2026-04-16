@@ -1,7 +1,7 @@
 // [TeleZeta] Doctor Medical Records list
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -27,7 +27,8 @@ export default function DoctorRecords() {
   const highlightId = searchParams.get('id');
   
   const [records, setRecords] = useState<EnrichedRecord[]>([]);
-  const [loading, setLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<EnrichedRecord | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -35,6 +36,8 @@ export default function DoctorRecords() {
   useEffect(() => {
     // Tunggu sampai auth check selesai dulu sebelum fetch
     if (!authReady || !user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
     async function fetchRecords() {
       setLoading(true);
