@@ -11,10 +11,10 @@ import * as Tabs from '@radix-ui/react-tabs';import { log, logError } from '@/li
 
 
 export default function DoctorStats() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     totalAll: 0,
     totalCompleted: 0,
@@ -28,23 +28,16 @@ export default function DoctorStats() {
   const [monthlyChart, setMonthlyChart] = useState<{month: string, count: number}[]>([]);
 
   useEffect(() => {
-    async function fetchStats() {
-      if (!user) return;
-      try {
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
 
-        const { data: apps, error } = await withTimeout(
-          supabase
-            .from('appointments')
-            .select('status, scheduled_at, patient_id')
-            .eq('doctor_id', user.id)
-        );
+    async function fetchStats() {
+      setLoading(true);
+      try {
+        const { data: apps, error } = await supabase
+          .from('appointments')
+          .select('status, scheduled_at, patient_id')
+          .eq('doctor_id', user!.id);
 
         if (error) throw error;
 
@@ -67,7 +60,6 @@ export default function DoctorStats() {
           if (app.status === 'pending' || app.status === 'confirmed' || app.status === 'ongoing') pending++;
           if (app.status === 'cancelled') cancelled++;
 
-          // Build chart data
           const appDate = new Date(app.scheduled_at);
           if (appDate.getMonth() === currentMonth) currentMonthCount++;
           
@@ -86,7 +78,7 @@ export default function DoctorStats() {
           totalPatients: patients.size,
           pending,
           cancelled,
-          earningsMtd: currentMonthCount * 150000, // Assuming Rp150.000 per consult
+          earningsMtd: currentMonthCount * 150000,
           rating: 4.8
         });
 
@@ -98,7 +90,8 @@ export default function DoctorStats() {
       }
     }
     fetchStats();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   if (loading) {
     return (

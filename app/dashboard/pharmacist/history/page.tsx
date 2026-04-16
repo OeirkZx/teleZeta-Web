@@ -14,18 +14,21 @@ import {
 } from 'lucide-react';
 
 export default function PharmacistHistory() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
 
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
+
     async function fetchHistory() {
-      if (!user) return;
+      setLoading(true);
       try {
         let query = supabase
           .from('prescriptions')
@@ -35,11 +38,10 @@ export default function PharmacistHistory() {
             doctor:doctors(specialty, profiles(full_name)),
             prescription_items(*)
           `)
-          .eq('pharmacist_id', user.id)
+          .eq('pharmacist_id', user!.id)
           .eq('status', 'dispensed')
           .order('updated_at', { ascending: false });
 
-        // Apply date filter
         if (dateRange !== 'all') {
           const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90;
           const since = new Date();
@@ -58,7 +60,8 @@ export default function PharmacistHistory() {
       }
     }
     fetchHistory();
-  }, [user, supabase, dateRange]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady, dateRange]);
 
   const filtered = prescriptions.filter(p => {
     if (!searchQuery) return true;

@@ -28,12 +28,12 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function DoctorProfile() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   
   const [profileData, setProfileData] = useState<any>(null);
   const [doctorData, setDoctorData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -48,12 +48,15 @@ export default function DoctorProfile() {
   });
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
+
     async function fetchData() {
-      if (!user) return;
+      setLoading(true);
       try {
         const [profRes, docRes] = await Promise.all([
-          supabase.from('profiles').select('*').eq('id', user.id).single(),
-          supabase.from('doctors').select('*').eq('id', user.id).single()
+          supabase.from('profiles').select('*').eq('id', user!.id).single(),
+          supabase.from('doctors').select('*').eq('id', user!.id).single()
         ]);
 
         if (profRes.error) throw profRes.error;
@@ -79,7 +82,8 @@ export default function DoctorProfile() {
       }
     }
     fetchData();
-  }, [user, supabase, reset]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) return;

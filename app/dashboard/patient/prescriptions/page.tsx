@@ -20,18 +20,22 @@ type EnrichedPrescription = Prescription & {
 };
 
 export default function PatientPrescriptions() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   
   const [prescriptions, setPrescriptions] = useState<EnrichedPrescription[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedPrescription, setSelectedPrescription] = useState<EnrichedPrescription | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady) return;
+
     async function fetchPrescriptions() {
+      setLoading(true);
       if (!user) {
         // Demo mode: tampilkan mock data untuk preview tanpa login
         setPrescriptions(MOCK_PRESCRIPTIONS as unknown as EnrichedPrescription[]);
@@ -39,25 +43,15 @@ export default function PatientPrescriptions() {
         return;
       }
       try {
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
-
-        const { data, error } = await withTimeout(
-          supabase
-            .from('prescriptions')
-            .select(`
-              *,
-              doctor:doctors (profiles (full_name)),
-              pharmacist:pharmacists (pharmacy_name)
-            `)
-            .eq('patient_id', user.id)
-            .order('created_at', { ascending: false })
-        );
+        const { data, error } = await supabase
+          .from('prescriptions')
+          .select(`
+            *,
+            doctor:doctors (profiles (full_name)),
+            pharmacist:pharmacists (pharmacy_name)
+          `)
+          .eq('patient_id', user.id)
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -73,7 +67,9 @@ export default function PatientPrescriptions() {
       }
     }
     fetchPrescriptions();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
+
 
   const handleTebusResep = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menebus resep ini sekarang? Resep akan diteruskan ke apotek mitra kami.')) return;

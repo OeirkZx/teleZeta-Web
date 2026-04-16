@@ -20,40 +20,31 @@ type PatientItem = {
 };
 
 export default function DoctorPatientsList() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   
   const [patients, setPatients] = useState<PatientItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Selected patient for viewing basic info dialog
   const [selectedPatient, setSelectedPatient] = useState<Profile | null>(null);
 
   useEffect(() => {
-    async function fetchPatients() {
-      if (!user) return;
-      try {
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
 
-        // Query appointments for this doctor to get unique patients
-        const { data, error } = await withTimeout(
-          supabase
-            .from('appointments')
-            .select('*, patient:profiles!patient_id(*)')
-            .eq('doctor_id', user.id)
-            .order('scheduled_at', { ascending: false })
-        );
+    async function fetchPatients() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('appointments')
+          .select('*, patient:profiles!patient_id(*)')
+          .eq('doctor_id', user!.id)
+          .order('scheduled_at', { ascending: false });
 
         if (error) throw error;
         
-        // Group by patient_id
         const patientMap = new Map<string, PatientItem>();
         
         (data as any[]).forEach(app => {
@@ -68,7 +59,6 @@ export default function DoctorPatientsList() {
           } else {
             const existing = patientMap.get(app.patient_id)!;
             existing.appointmentCount += 1;
-            // since ordered by desc, the first one seen is the latest
             patientMap.set(app.patient_id, existing);
           }
         });
@@ -81,7 +71,8 @@ export default function DoctorPatientsList() {
       }
     }
     fetchPatients();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   const filteredPatients = patients.filter(p => 
     p.profile.full_name?.toLowerCase().includes(searchQuery.toLowerCase())

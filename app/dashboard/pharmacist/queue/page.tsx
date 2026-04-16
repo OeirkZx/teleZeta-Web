@@ -16,21 +16,24 @@ import {
 type QueueFilter = 'all' | 'processing' | 'ready';
 
 export default function PharmacistQueue() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
 
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<QueueFilter>('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
+
     let subscription: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     async function fetchQueue() {
-      if (!user) return;
+      setLoading(true);
       try {
         const { data, error } = await supabase
           .from('prescriptions')
@@ -40,7 +43,7 @@ export default function PharmacistQueue() {
             doctor:doctors(specialty, profiles(full_name)),
             prescription_items(*)
           `)
-          .or(`pharmacist_id.eq.${user.id},pharmacist_id.is.null`)
+          .or(`pharmacist_id.eq.${user!.id},pharmacist_id.is.null`)
           .in('status', ['processing', 'ready'])
           .order('created_at', { ascending: true });
 
@@ -56,25 +59,24 @@ export default function PharmacistQueue() {
 
     fetchQueue();
 
-    if (user) {
-      subscription = supabase
-        .channel('pharmacist-queue-changes')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'prescriptions' },
-          () => {
-            fetchQueue();
-          }
-        )
-        .subscribe();
-    }
+    subscription = supabase
+      .channel('pharmacist-queue-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'prescriptions' },
+        () => {
+          fetchQueue();
+        }
+      )
+      .subscribe();
 
     return () => {
       if (subscription) {
         supabase.removeChannel(subscription);
       }
     };
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   const handleUpdateStatus = async (id: string, newStatus: 'ready' | 'dispensed') => {
     if (!user) return;

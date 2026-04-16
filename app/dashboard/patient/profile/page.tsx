@@ -23,11 +23,11 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function PatientProfile() {
-  const { user, profile: authProfile } = useAuth();
+  const { user, profile: authProfile, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -43,13 +43,16 @@ export default function PatientProfile() {
   });
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
+
     async function fetchProfile() {
-      if (!user) return;
+      setLoading(true);
       try {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', user!.id)
           .single();
 
         if (error) throw error;
@@ -70,7 +73,8 @@ export default function PatientProfile() {
       }
     }
     fetchProfile();
-  }, [user, supabase, reset]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) return;

@@ -12,6 +12,9 @@ interface AuthState {
   profile: Profile | null;
   role: UserRole | null;
   loading: boolean;
+  // authReady: true ketika auth check sudah selesai.
+  // Ini mencegah halaman fetch data sebelum waktunya (race condition → double skeleton).
+  authReady: boolean;
   error: string | null;
 }
 
@@ -37,7 +40,10 @@ export function AuthProvider({
     user: initialUser,
     profile: initialProfile,
     role: initialRole,
-    loading: false, // SSR guarantees truth on mount!
+    loading: false,
+    // Jika SSR sudah punya user → auth sudah pasti siap, langsung true.
+    // Jika tidak ada user dari SSR → tunggu INITIAL_SESSION untuk set true.
+    authReady: initialUser !== null,
     error: null,
   });
 
@@ -63,13 +69,16 @@ export function AuthProvider({
   }, [supabase]);
 
   useEffect(() => {
-    // Listen to real-time auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         log('[TeleZeta] Auth event:', event);
         
-        // Skip INITIAL_SESSION since SSR already provided the exact initial state
-        if (event === 'INITIAL_SESSION') return;
+        if (event === 'INITIAL_SESSION') {
+          // Setelah INITIAL_SESSION, auth sudah pasti diketahui statusnya
+          // (login atau tidak). Set authReady = true agar halaman bisa fetch.
+          setState(prev => ({ ...prev, authReady: true }));
+          return;
+        }
 
         if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
           const profile = await fetchProfile(session.user.id);
@@ -78,6 +87,7 @@ export function AuthProvider({
             profile,
             role: profile?.role as UserRole || null,
             loading: false,
+            authReady: true,
             error: null,
           });
         } else if (event === 'SIGNED_OUT') {
@@ -86,6 +96,7 @@ export function AuthProvider({
             profile: null,
             role: null,
             loading: false,
+            authReady: true,
             error: null,
           });
         }
@@ -99,35 +110,26 @@ export function AuthProvider({
 
   const signOut = async () => {
     try {
-      // Set loading state dulu agar UI memberikan feedback
       setState(prev => ({ ...prev, loading: true }));
-      
-      // Clear browser local storage / cookie config reliably
       await supabase.auth.signOut();
-      
-      // Clear server-side JWT cookie using Server Action
       const result = await logoutUser();
       
       if (result?.error) {
         logError('[TeleZeta] Sign out API error:', result.error);
       }
       
-      // Reset state secara manual untuk memastikan
-      // tidak ada sisa data user di memory
       setState({
         user: null,
         profile: null,
         role: null,
         loading: false,
+        authReady: true,
         error: null,
       });
       
-      // Gunakan replace agar tidak bisa back ke halaman dashboard
-      // setelah logout
       window.location.replace('/login');
     } catch (err) {
       logError('[TeleZeta] Sign out failed:', err);
-      // Force redirect meskipun ada error
       window.location.replace('/login');
     }
   };

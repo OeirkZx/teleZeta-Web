@@ -16,37 +16,30 @@ import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings
 
 
 export default function DoctorDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, authReady } = useAuth();
   const router = useRouter();
   const supabase = createClient();
 
   const [doctorData, setDoctorData] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [stats, setStats] = useState({ total_patients: 0, pending_appointments: 0, completed_today: 0 });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      if (!user) return;
-      try {
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
 
+    async function fetchData() {
+      setLoading(true);
+      try {
         // Get doctor profile
-        const { data: doc } = await withTimeout(
-          supabase
-            .from('doctors')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-        );
+        const { data: doc } = await supabase
+          .from('doctors')
+          .select('*')
+          .eq('id', user!.id)
+          .single();
         
         setDoctorData(doc);
 
@@ -56,15 +49,13 @@ export default function DoctorDashboard() {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const { data: apps } = await withTimeout(
-          supabase
-            .from('appointments')
-            .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url)')
-            .eq('doctor_id', user.id)
-            .gte('scheduled_at', today.toISOString())
-            .lt('scheduled_at', tomorrow.toISOString())
-            .order('scheduled_at', { ascending: true })
-        );
+        const { data: apps } = await supabase
+          .from('appointments')
+          .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url)')
+          .eq('doctor_id', user!.id)
+          .gte('scheduled_at', today.toISOString())
+          .lt('scheduled_at', tomorrow.toISOString())
+          .order('scheduled_at', { ascending: true });
 
         setAppointments(apps || []);
 
@@ -80,7 +71,7 @@ export default function DoctorDashboard() {
         const { data: uniquePatients } = await supabase
           .from('appointments')
           .select('patient_id')
-          .eq('doctor_id', user.id)
+          .eq('doctor_id', user!.id)
           .gte('scheduled_at', startOfMonth.toISOString());
           
         const uniqueCount = new Set((uniquePatients || []).map(p => p.patient_id)).size;
@@ -100,7 +91,7 @@ export default function DoctorDashboard() {
     }
     fetchData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [authReady]);
 
   const toggleAvailability = async () => {
     if (!user || !doctorData || updatingStatus) return;

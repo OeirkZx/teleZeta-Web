@@ -20,11 +20,11 @@ type AppointmentWithDoctor = Appointment & {
 };
 
 export default function PatientAppointments() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   
   const [appointments, setAppointments] = useState<AppointmentWithDoctor[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -35,7 +35,11 @@ export default function PatientAppointments() {
   const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady) return;
+
     async function fetchAppointments() {
+      setLoading(true);
       if (!user) {
         // Demo mode: tampilkan mock data untuk preview tanpa login
         setAppointments(MOCK_APPOINTMENTS as unknown as AppointmentWithDoctor[]);
@@ -44,21 +48,11 @@ export default function PatientAppointments() {
       }
       
       try {
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
-
-        const { data, error } = await withTimeout(
-          supabase
-            .from('appointments')
-            .select('*, doctor:doctors(*, profiles(*))')
-            .eq('patient_id', user.id)
-            .order('scheduled_at', { ascending: false })
-        );
+        const { data, error } = await supabase
+          .from('appointments')
+          .select('*, doctor:doctors(*, profiles(*))')
+          .eq('patient_id', user.id)
+          .order('scheduled_at', { ascending: false });
 
         if (error) throw error;
 
@@ -76,7 +70,9 @@ export default function PatientAppointments() {
     }
 
     fetchAppointments();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
+
 
   // Realtime subscription: update status badge automatically when doctor confirms/rejects
   useEffect(() => {

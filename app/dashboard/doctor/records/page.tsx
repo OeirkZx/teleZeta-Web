@@ -21,45 +21,37 @@ type EnrichedRecord = MedicalRecord & {
 };
 
 export default function DoctorRecords() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   const searchParams = useSearchParams();
-  const highlightId = searchParams.get('id'); // pre-open if came from somewhere
+  const highlightId = searchParams.get('id');
   
   const [records, setRecords] = useState<EnrichedRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<EnrichedRecord | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchRecords() {
-      if (!user) return;
-      try {
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
 
-        const { data, error } = await withTimeout(
-          supabase
-            .from('medical_records')
-            .select(`
-              *,
-              patient:profiles!patient_id (*),
-              appointment:appointments (scheduled_at)
-            `)
-            .eq('doctor_id', user.id)
-            .order('created_at', { ascending: false })
-        );
+    async function fetchRecords() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('medical_records')
+          .select(`
+            *,
+            patient:profiles!patient_id (*),
+            appointment:appointments (scheduled_at)
+          `)
+          .eq('doctor_id', user!.id)
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setRecords((data ?? []) as unknown as EnrichedRecord[]);
         
-        // Auto open if highlighted
         if (highlightId && data) {
           const found = data.find((r: any) => r.appointment_id === highlightId);
           if (found) setSelectedRecord(found as unknown as EnrichedRecord);
@@ -70,8 +62,9 @@ export default function DoctorRecords() {
         setLoading(false);
       }
     }
-    fetchRecords().catch(console.error);
-  }, [user, supabase, highlightId]);
+    fetchRecords();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   const filteredRecords = records.filter((r: EnrichedRecord) =>
     (r.diagnosis ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -20,33 +20,26 @@ type AppointmentWithPatient = Appointment & {
 };
 
 export default function DoctorSchedule() {
-  const { user, profile } = useAuth();
+  const { user, profile, authReady } = useAuth();
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   
   const [appointments, setAppointments] = useState<AppointmentWithPatient[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchAppointments() {
-      if (!user) return;
-      try {
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
 
-        const { data, error } = await withTimeout(
-          supabase
-            .from('appointments')
-            .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url, gender, date_of_birth)')
-            .eq('doctor_id', user.id)
-            .order('scheduled_at', { ascending: true }) // Earliest first for doctor
-        );
+    async function fetchAppointments() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('appointments')
+          .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url, gender, date_of_birth)')
+          .eq('doctor_id', user!.id)
+          .order('scheduled_at', { ascending: true });
 
         if (error) throw error;
         setAppointments((data || []) as any[]);
@@ -57,7 +50,8 @@ export default function DoctorSchedule() {
       }
     }
     fetchAppointments();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   const handleUpdateStatus = async (id: string, newStatus: 'confirmed' | 'cancelled') => {
     if (!confirm(`Apakah Anda yakin ingin ${newStatus === 'confirmed' ? 'menerima' : 'menolak'} jadwal ini?`)) return;

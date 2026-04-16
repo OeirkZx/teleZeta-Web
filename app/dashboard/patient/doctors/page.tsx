@@ -36,7 +36,7 @@ function DoctorsPageContent() {
   const supabase = useMemo(() => createClient(), []);
 
   const [doctors, setDoctors] = useState<DoctorWithProfile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('Semua');
 
@@ -52,6 +52,7 @@ function DoctorsPageContent() {
 
   useEffect(() => {
     async function fetchDoctors() {
+      setLoading(true);
       try {
         const { data, error } = await supabase
           .from('doctors')

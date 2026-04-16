@@ -25,19 +25,23 @@ type EnrichedRecord = MedicalRecord & {
 };
 
 export default function PatientRecords() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
   const searchParams = useSearchParams();
   const highlightId = searchParams.get('id'); // pre-open if came from appointments
   
   const [records, setRecords] = useState<EnrichedRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<EnrichedRecord | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady) return;
+
     async function fetchRecords() {
+      setLoading(true);
       if (!user) {
         // Demo mode: tampilkan mock data untuk preview tanpa login
         setRecords(MOCK_MEDICAL_RECORDS as any[]);
@@ -45,31 +49,20 @@ export default function PatientRecords() {
         return;
       }
       try {
-        // Fallback timeout protection to prevent hanging in skeleton load
-        const withTimeout = (promise: PromiseLike<any>, ms = 7000): Promise<any> => {
-          let timeoutId: ReturnType<typeof setTimeout>;
-          const timeoutPromise = new Promise<any>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Koneksi timeout saat mengambil data')), ms);
-          });
-          return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => clearTimeout(timeoutId));
-        };
-
-        const { data, error } = await withTimeout(
-          supabase
-            .from('medical_records')
-            .select(`
-              *,
-              appointment:appointments (
-                scheduled_at,
-                doctor:doctors (
-                  specialty,
-                  profiles (full_name)
-                )
+        const { data, error } = await supabase
+          .from('medical_records')
+          .select(`
+            *,
+            appointment:appointments (
+              scheduled_at,
+              doctor:doctors (
+                specialty,
+                profiles (full_name)
               )
-            `)
-            .eq('patient_id', user.id)
-            .order('created_at', { ascending: false })
-        );
+            )
+          `)
+          .eq('patient_id', user.id)
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -78,7 +71,7 @@ export default function PatientRecords() {
         
         // Auto open if highlighted
         if (highlightId && data && data.length > 0) {
-          const found = data.find((r: any) => r.appointment_id === highlightId);
+          const found = data.find(r => (r as any).appointment_id === highlightId);
           if (found) setSelectedRecord(found as any);
         }
       } catch (err) {
@@ -91,7 +84,9 @@ export default function PatientRecords() {
       }
     }
     fetchRecords();
-  }, [user, supabase, highlightId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
+
 
   const filteredRecords = records.filter((r: EnrichedRecord) =>
     (r.diagnosis ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||

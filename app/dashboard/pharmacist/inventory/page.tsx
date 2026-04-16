@@ -18,11 +18,11 @@ import * as Dialog from '@radix-ui/react-dialog';import { log, logError } from '
 
 
 export default function PharmacistInventory() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
 
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showLowStockOnly, setShowLowStockOnly] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -41,13 +41,16 @@ export default function PharmacistInventory() {
   });
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
+
     async function fetchInventory() {
-      if (!user) return;
+      setLoading(true);
       try {
         const { data, error } = await supabase
           .from('inventory')
           .select('*')
-          .eq('pharmacist_id', user.id)
+          .eq('pharmacist_id', user!.id)
           .order('medicine_name', { ascending: true });
 
         if (error) {
@@ -64,7 +67,8 @@ export default function PharmacistInventory() {
       }
     }
     fetchInventory();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   const openAddDialog = () => {
     setEditingItem(null);

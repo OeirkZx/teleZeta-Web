@@ -13,37 +13,35 @@ import { ArrowRight, Package, Store, Clock, CheckCircle2, TrendingUp, AlertCircl
 
 
 export default function PharmacistDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, authReady } = useAuth();
   const supabase = useMemo(() => createClient(), []);
 
   const [pharmacistData, setPharmacistData] = useState<any>(null);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [stats, setStats] = useState({ new: 0, processing: 0, ready: 0, completed_today: 0 });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    // Tunggu sampai auth check selesai dulu sebelum fetch
+    if (!authReady || !user) return;
+
     async function fetchData() {
-      if (!user) return;
+      setLoading(true);
       try {
         // Get pharmacist profile
         const { data: pharm } = await supabase
           .from('pharmacists')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', user!.id)
           .single();
         
         setPharmacistData(pharm);
 
-        // Get prescriptions assigned to this pharmacist or pending ones
-        // In real app, pending prescriptions might be broadcasted to all nearby pharmacies
-        // For this demo, let's just fetch all 'processing', 'ready', 'completed' for this pharmacist
-        // And 'pending' ones that are not assigned yet, OR maybe they are assigned at payment.
-        // Let's assume patients choose a pharmacy when they redeem.
         const { data: orders } = await supabase
           .from('prescriptions')
           .select('*, patient:profiles!patient_id(full_name), doctor:doctors(profiles(full_name)), prescription_items(*)')
-          .or(`pharmacist_id.eq.${user.id},and(pharmacist_id.is.null,status.eq.processing)`)
+          .or(`pharmacist_id.eq.${user!.id},and(pharmacist_id.is.null,status.eq.processing)`)
           .order('updated_at', { ascending: false });
 
         setRecentOrders(orders || []);
@@ -51,7 +49,7 @@ export default function PharmacistDashboard() {
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
-        const new_orders = orders?.filter(o => o.status === 'pending').length || 0; // Orders not yet processed
+        const new_orders = orders?.filter(o => o.status === 'pending').length || 0;
         const proc = orders?.filter(o => o.status === 'processing').length || 0;
         const ready = orders?.filter(o => o.status === 'ready').length || 0;
         
@@ -69,7 +67,8 @@ export default function PharmacistDashboard() {
       }
     }
     fetchData();
-  }, [user, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authReady]);
 
   if (loading) {
     return (
