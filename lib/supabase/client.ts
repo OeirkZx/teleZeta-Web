@@ -18,5 +18,46 @@ export function createClient() {
   const key = SUPABASE_ANON_KEY.length > 20 
     ? SUPABASE_ANON_KEY : FALLBACK_KEY
 
-  return createBrowserClient(url, key)
+  return createBrowserClient(url, key, {
+    // Override default cookie handling untuk membuat "Session Cookie"
+    // Secara default Supabase set maxAge 1 tahun. Kita hapus maxAge-nya 
+    // agar token otomatis terhapus saat browser ditutup (Auto-Logout).
+    cookies: {
+      getAll() {
+        if (typeof document === 'undefined') return [];
+        return document.cookie.split(';').map(c => c.trim()).filter(Boolean).map(c => {
+          const idx = c.indexOf('=');
+          if (idx === -1) return { name: c, value: '' };
+          const name = c.substring(0, idx);
+          let value = c.substring(idx + 1);
+          if (value.startsWith('"') && value.endsWith('"')) {
+            value = value.slice(1, -1);
+          }
+          try {
+            return { name, value: decodeURIComponent(value) };
+          } catch {
+            return { name, value };
+          }
+        });
+      },
+      setAll(cookiesToSet) {
+        if (typeof document === 'undefined') return;
+        cookiesToSet.forEach(({ name, value, options }) => {
+          let cookieStr = `${name}=${encodeURIComponent(value)}`;
+          if (options.path) cookieStr += `; Path=${options.path}`;
+          if (options.domain) cookieStr += `; Domain=${options.domain}`;
+          if (options.sameSite) cookieStr += `; SameSite=${options.sameSite}`;
+          if (options.secure) cookieStr += `; Secure`;
+          
+          // Jika value kosong, hapus cookie dengan maxAge=0
+          // Jika tidak kosong, JANGAN set maxAge agar menjadi Session Cookie
+          if (!value) {
+            cookieStr += '; Max-Age=0';
+          }
+          
+          document.cookie = cookieStr;
+        });
+      }
+    }
+  })
 }
