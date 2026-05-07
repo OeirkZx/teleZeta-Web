@@ -67,7 +67,7 @@ export function useNotifications(userId: string | null) {
           table: 'notifications',
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
+        (payload: any) => {
           log('[TeleZeta] New notification:', payload);
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev]);

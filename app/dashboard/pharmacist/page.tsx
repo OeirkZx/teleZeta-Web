@@ -53,11 +53,11 @@ export default function PharmacistDashboard() {
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
-        const new_orders = orders?.filter(o => o.status === 'pending').length || 0;
-        const proc = orders?.filter(o => o.status === 'processing').length || 0;
-        const ready = orders?.filter(o => o.status === 'ready').length || 0;
+        const new_orders = orders?.filter((o: any) => o.status === 'pending').length || 0;
+        const proc = orders?.filter((o: any) => o.status === 'processing').length || 0;
+        const ready = orders?.filter((o: any) => o.status === 'ready').length || 0;
         
-        const comp = orders?.filter(o => 
+        const comp = orders?.filter((o: any) => 
           o.status === 'dispensed' && new Date(o.updated_at) >= todayStart
         ).length || 0;
 

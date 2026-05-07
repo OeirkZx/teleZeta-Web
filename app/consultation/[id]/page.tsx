@@ -151,7 +151,7 @@ export default function ConsultationRoom({
           table: 'appointments',
           filter: `id=eq.${id}`,
         },
-        async (payload) => {
+        async (payload: any) => {
           const updated = payload.new as { id: string; status: string };
           if (updated.status === 'completed') {
             // Leave any active video call

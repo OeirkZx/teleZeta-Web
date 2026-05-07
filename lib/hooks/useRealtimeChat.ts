@@ -64,7 +64,7 @@ export function useRealtimeChat(appointmentId: string | null) {
           table: 'messages',
           filter: `appointment_id=eq.${appointmentId}`,
         },
-        async (payload) => {
+        async (payload: any) => {
           log('[TeleZeta] New message received:', payload);
           const newMessage = payload.new as Message;
 

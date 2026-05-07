@@ -68,7 +68,7 @@ export default function PharmacistQueue() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'prescriptions' },
-        async (payload) => {
+        async (payload: any) => {
           const newRow = payload.new as any;
           // Only care about actionable statuses
           if (!['processing', 'ready'].includes(newRow.status)) return;
@@ -89,7 +89,7 @@ export default function PharmacistQueue() {
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'prescriptions' },
-        (payload) => {
+        (payload: any) => {
           const updated = payload.new as any;
           if (updated.status === 'dispensed') {
             // Remove from queue when dispensed
@@ -109,7 +109,7 @@ export default function PharmacistQueue() {
       .on(
         'postgres_changes',
         { event: 'DELETE', schema: 'public', table: 'prescriptions' },
-        (payload) => {
+        (payload: any) => {
           setPrescriptions(prev => prev.filter(p => p.id !== (payload.old as any).id));
         }
       )

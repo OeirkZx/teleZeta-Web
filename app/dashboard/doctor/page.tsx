@@ -79,7 +79,7 @@ export default function DoctorDashboard() {
         // Stats from results already in memory
         const pending = apps.filter((a: any) => a.status === 'pending' || a.status === 'confirmed').length;
         const completed = apps.filter((a: any) => a.status === 'completed').length;
-        const uniqueCount = new Set((uniquePatientsRes.data || []).map(p => p.patient_id)).size;
+        const uniqueCount = new Set((uniquePatientsRes.data || []).map((p: any) => p.patient_id)).size;
 
         setStats({
           total_patients: uniqueCount,

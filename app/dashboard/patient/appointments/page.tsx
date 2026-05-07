@@ -92,7 +92,7 @@ export default function PatientAppointments() {
           table: 'appointments',
           filter: `patient_id=eq.${user.id}`,
         },
-        (payload) => {
+        (payload: any) => {
           const updated = payload.new as { id: string; status: AppointmentStatus };
           setAppointments(prev =>
             prev.map(app =>

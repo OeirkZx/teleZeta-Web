@@ -75,7 +75,7 @@ export function AuthProvider({
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         log('[TeleZeta] Auth event:', event);
         
         if (event === 'INITIAL_SESSION') {
@@ -107,9 +107,10 @@ export function AuthProvider({
 
         if (event === 'SIGNED_IN' && session?.user) {
           // SIGNED_IN terpicu setelah INITIAL_SESSION di Vercel (normal behavior).
-          // Kita update user/profile TAPI tidak mengubah authReady.
-          // Karena authReady tidak berubah, useEffect([authReady]) di halaman
-          // TIDAK akan terpicu ulang → tidak ada re-fetch → tidak ada skeleton flash.
+          // Skip re-fetch jika user sudah sama — mencegah network request ganda.
+          if (state.user?.id === session.user.id && state.profile) {
+            return; // User sudah diketahui, skip
+          }
           const profile = await fetchProfile(session.user.id);
           setState(prev => ({
             ...prev,
@@ -145,7 +146,7 @@ export function AuthProvider({
     };
   }, [supabase, fetchProfile]);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true }));
       await supabase.auth.signOut();
@@ -170,13 +171,13 @@ export function AuthProvider({
       logError('[TeleZeta] Sign out failed:', err);
       window.location.replace('/login');
     }
-  };
+  }, [supabase]);
 
-  const value = {
+  const value = useMemo(() => ({
     ...state,
     signOut,
     supabase,
-  };
+  }), [state, signOut, supabase]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

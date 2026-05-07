@@ -76,7 +76,7 @@ export default function PatientRecords() {
         
         // Auto open if highlighted
         if (highlightId && data && data.length > 0) {
-          const found = data.find(r => (r as any).appointment_id === highlightId);
+          const found = data.find((r: any) => (r as any).appointment_id === highlightId);
           if (found) setSelectedRecord(found as any);
         }
       } catch (err) {

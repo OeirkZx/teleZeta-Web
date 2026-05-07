@@ -11,14 +11,29 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const FALLBACK_URL = 'https://placeholder.supabase.co'
 const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2MDAwMDAwMDAsImV4cCI6MTkwMDAwMDAwMH0.placeholder'
 
+// Module-level singleton — @supabase/ssr sudah punya cache internal,
+// tapi kita guard di sini juga untuk keamanan ekstra.
+let _browserClient: ReturnType<typeof createBrowserClient> | null = null;
+
 export function createClient() {
+  if (_browserClient) return _browserClient;
+
   const url = SUPABASE_URL.startsWith('https://') && 
               !SUPABASE_URL.includes('placeholder')
     ? SUPABASE_URL : FALLBACK_URL
   const key = SUPABASE_ANON_KEY.length > 20 
     ? SUPABASE_ANON_KEY : FALLBACK_KEY
 
-  return createBrowserClient(url, key, {
+  _browserClient = createBrowserClient(url, key, {
+    auth: {
+      // FIX: Disable navigator.locks untuk mencegah cross-tab deadlock.
+      // Cookies sudah inherently shared antar tab, jadi lock-based
+      // coordination dari GoTrueClient tidak diperlukan dan justru
+      // menyebabkan browser freeze saat 2+ tab terbuka bersamaan.
+      lock: async (_name: string, _acquireTimeout: number, fn: () => Promise<any>) => {
+        return await fn();
+      },
+    },
     // Override default cookie handling untuk membuat "Session Cookie"
     // Secara default Supabase set maxAge 1 tahun. Kita hapus maxAge-nya 
     // agar token otomatis terhapus saat browser ditutup (Auto-Logout).
@@ -59,5 +74,7 @@ export function createClient() {
         });
       }
     }
-  })
+  });
+
+  return _browserClient;
 }
