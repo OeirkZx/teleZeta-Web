@@ -53,9 +53,10 @@ export default function PatientAppointments() {
       try {
         const { data, error } = await supabase
           .from('appointments')
-          .select('*, doctor:doctors(*, profiles(*))')
+          .select('id, patient_id, doctor_id, scheduled_at, consultation_type, status, chief_complaint, consultation_fee, notes, created_at, updated_at, doctor:doctors(specialty, consultation_fee, profiles(full_name, avatar_url))')
           .eq('patient_id', user.id)
-          .order('scheduled_at', { ascending: false });
+          .order('scheduled_at', { ascending: false })
+          .limit(50);
 
         if (error) throw error;
 

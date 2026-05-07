@@ -18,7 +18,7 @@ import { ArrowRight, Video, Calendar, Clock, Activity, Users, FileText, Settings
 export default function DoctorDashboard() {
   const { user, profile, authReady } = useAuth();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [doctorData, setDoctorData] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -37,47 +37,49 @@ export default function DoctorDashboard() {
     async function fetchData() {
       setLoading(true);
       try {
-        // Get doctor profile
-        const { data: doc } = await supabase
-          .from('doctors')
-          .select('*')
-          .eq('id', user!.id)
-          .single();
-        
-        setDoctorData(doc);
-
-        // Get today's appointments
+        // Parallel: fetch doctor profile, today's appointments, and monthly patient count
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
-
-        const { data: apps } = await supabase
-          .from('appointments')
-          .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url)')
-          .eq('doctor_id', user!.id)
-          .gte('scheduled_at', today.toISOString())
-          .lt('scheduled_at', tomorrow.toISOString())
-          .order('scheduled_at', { ascending: true });
-
-        setAppointments(apps || []);
-
-        // Stats calculation
-        const pending = apps?.filter((a: any) => a.status === 'pending' || a.status === 'confirmed').length || 0;
-        const completed = apps?.filter((a: any) => a.status === 'completed').length || 0;
-
-        // Total unique patients this month
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
         startOfMonth.setHours(0, 0, 0, 0);
-        
-        const { data: uniquePatients } = await supabase
-          .from('appointments')
-          .select('patient_id')
-          .eq('doctor_id', user!.id)
-          .gte('scheduled_at', startOfMonth.toISOString());
-          
-        const uniqueCount = new Set((uniquePatients || []).map(p => p.patient_id)).size;
+
+        const [doctorRes, appsRes, uniquePatientsRes] = await Promise.all([
+          // 1. Doctor availability status
+          supabase
+            .from('doctors')
+            .select('is_available')
+            .eq('id', user!.id)
+            .single(),
+
+          // 2. Today's appointments with patient info
+          supabase
+            .from('appointments')
+            .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url)')
+            .eq('doctor_id', user!.id)
+            .gte('scheduled_at', today.toISOString())
+            .lt('scheduled_at', tomorrow.toISOString())
+            .order('scheduled_at', { ascending: true }),
+
+          // 3. Unique patients this month — only need patient_id
+          supabase
+            .from('appointments')
+            .select('patient_id')
+            .eq('doctor_id', user!.id)
+            .gte('scheduled_at', startOfMonth.toISOString()),
+        ]);
+
+        setDoctorData(doctorRes.data);
+
+        const apps = appsRes.data || [];
+        setAppointments(apps);
+
+        // Stats from results already in memory
+        const pending = apps.filter((a: any) => a.status === 'pending' || a.status === 'confirmed').length;
+        const completed = apps.filter((a: any) => a.status === 'completed').length;
+        const uniqueCount = new Set((uniquePatientsRes.data || []).map(p => p.patient_id)).size;
 
         setStats({
           total_patients: uniqueCount,

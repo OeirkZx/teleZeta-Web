@@ -42,7 +42,7 @@ export default function DoctorPatientsList() {
       try {
         const { data, error } = await supabase
           .from('appointments')
-          .select('*, patient:profiles!patient_id(*)')
+          .select('patient_id, scheduled_at, patient:profiles!patient_id(id, full_name, avatar_url, gender, date_of_birth)')
           .eq('doctor_id', user!.id)
           .order('scheduled_at', { ascending: false });
 

@@ -45,12 +45,13 @@ export default function DoctorRecords() {
         const { data, error } = await supabase
           .from('medical_records')
           .select(`
-            *,
-            patient:profiles!patient_id (*),
+            id, appointment_id, patient_id, doctor_id, diagnosis, notes, follow_up_date, created_at,
+            patient:profiles!patient_id (id, full_name, avatar_url, gender, date_of_birth),
             appointment:appointments (scheduled_at)
           `)
           .eq('doctor_id', user!.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(30);
 
         if (error) throw error;
         setRecords((data ?? []) as unknown as EnrichedRecord[]);

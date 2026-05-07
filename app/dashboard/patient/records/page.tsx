@@ -56,7 +56,7 @@ export default function PatientRecords() {
         const { data, error } = await supabase
           .from('medical_records')
           .select(`
-            *,
+            id, appointment_id, patient_id, doctor_id, diagnosis, notes, follow_up_date, created_at,
             appointment:appointments (
               scheduled_at,
               doctor:doctors (
@@ -66,7 +66,8 @@ export default function PatientRecords() {
             )
           `)
           .eq('patient_id', user.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(30);
 
         if (error) throw error;
 

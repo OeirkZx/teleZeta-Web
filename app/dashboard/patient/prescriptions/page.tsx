@@ -49,12 +49,14 @@ export default function PatientPrescriptions() {
         const { data, error } = await supabase
           .from('prescriptions')
           .select(`
-            *,
+            id, patient_id, doctor_id, pharmacist_id, medical_record_id, status, notes, created_at, updated_at,
             doctor:doctors (profiles (full_name)),
-            pharmacist:pharmacists (pharmacy_name)
+            pharmacist:pharmacists (pharmacy_name),
+            prescription_items (id, medicine_name, dosage, frequency, quantity, instructions)
           `)
           .eq('patient_id', user.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(30);
 
         if (error) throw error;
 

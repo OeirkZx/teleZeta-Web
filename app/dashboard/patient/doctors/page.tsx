@@ -56,13 +56,13 @@ function DoctorsPageContent() {
       try {
         const { data, error } = await supabase
           .from('doctors')
-          .select('*, profiles(*)')
+          .select('id, specialty, hospital, bio, consultation_fee, rating, total_reviews, experience_years, is_available, profiles(full_name, avatar_url)')
           .order('is_available', { ascending: false });
 
         if (error || !data) {
           throw error;
         }
-        setDoctors(data as DoctorWithProfile[]);
+        setDoctors(data as unknown as DoctorWithProfile[]);
       } catch (err) {
         logError('[TeleZeta] Failed to fetch doctors:', err);
         setDoctors(MOCK_DOCTORS); // Fallback

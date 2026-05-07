@@ -41,10 +41,10 @@ export default function PharmacistQueue() {
         const { data, error } = await supabase
           .from('prescriptions')
           .select(`
-            *,
+            id, status, created_at, updated_at, pharmacist_id,
             patient:profiles!patient_id(full_name, phone, gender, date_of_birth),
             doctor:doctors(specialty, profiles(full_name)),
-            prescription_items(*)
+            prescription_items(id, medicine_name, dosage, quantity)
           `)
           .or(`pharmacist_id.eq.${user!.id},pharmacist_id.is.null`)
           .in('status', ['processing', 'ready'])
@@ -62,13 +62,55 @@ export default function PharmacistQueue() {
 
     fetchQueue();
 
+    // Realtime: smart local state update instead of full refetch
     subscription = supabase
       .channel('pharmacist-queue-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'prescriptions' },
-        () => {
-          fetchQueue();
+        { event: 'INSERT', schema: 'public', table: 'prescriptions' },
+        async (payload) => {
+          const newRow = payload.new as any;
+          // Only care about actionable statuses
+          if (!['processing', 'ready'].includes(newRow.status)) return;
+          // Fetch with joins since realtime payload doesn't include them
+          const { data } = await supabase
+            .from('prescriptions')
+            .select(`
+              id, status, created_at, updated_at, pharmacist_id,
+              patient:profiles!patient_id(full_name, phone, gender, date_of_birth),
+              doctor:doctors(specialty, profiles(full_name)),
+              prescription_items(id, medicine_name, dosage, quantity)
+            `)
+            .eq('id', newRow.id)
+            .single();
+          if (data) setPrescriptions(prev => [data, ...prev]);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'prescriptions' },
+        (payload) => {
+          const updated = payload.new as any;
+          if (updated.status === 'dispensed') {
+            // Remove from queue when dispensed
+            setPrescriptions(prev => prev.filter(p => p.id !== updated.id));
+          } else {
+            // Patch only the changed scalar fields
+            setPrescriptions(prev =>
+              prev.map(p =>
+                p.id === updated.id
+                  ? { ...p, status: updated.status, pharmacist_id: updated.pharmacist_id, updated_at: updated.updated_at }
+                  : p
+              )
+            );
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'prescriptions' },
+        (payload) => {
+          setPrescriptions(prev => prev.filter(p => p.id !== (payload.old as any).id));
         }
       )
       .subscribe();

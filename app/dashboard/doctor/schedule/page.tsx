@@ -38,10 +38,14 @@ export default function DoctorSchedule() {
     async function fetchAppointments() {
       setLoading(true);
       try {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 90); // Only show last 90 days of history
+
         const { data, error } = await supabase
           .from('appointments')
           .select('id, scheduled_at, status, consultation_type, chief_complaint, patient:profiles!patient_id(full_name, avatar_url, gender, date_of_birth)')
           .eq('doctor_id', user!.id)
+          .gte('scheduled_at', cutoff.toISOString())
           .order('scheduled_at', { ascending: true });
 
         if (error) throw error;
