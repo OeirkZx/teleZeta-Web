@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -10,29 +10,20 @@ interface ScrollRevealProps {
 
 export default function ScrollReveal({ children, className = '', staggerChildren = false }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Memeriksa preferensi reduced motion user
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      setIsVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            if (staggerChildren) {
-              const childrenCols = entry.target.querySelectorAll('.reveal-item');
-              childrenCols.forEach((child, index) => {
-                const el = child as HTMLElement;
-                el.style.animationDelay = `${index * 0.15}s`;
-                el.classList.add('animate-fadeUp');
-                el.style.opacity = '1';
-              });
-            } else {
-              const el = entry.target as HTMLElement;
-              el.classList.add('animate-fadeUp');
-              el.style.opacity = '1';
-            }
+            setIsVisible(true);
             observer.unobserve(entry.target);
           }
         });
@@ -44,23 +35,19 @@ export default function ScrollReveal({ children, className = '', staggerChildren
     );
 
     if (ref.current) {
-      if (staggerChildren) {
-        // Initial state for children
-        const childrenCols = ref.current.querySelectorAll('.reveal-item');
-        childrenCols.forEach(child => {
-          (child as HTMLElement).style.opacity = '0';
-        });
-      } else {
-        ref.current.style.opacity = '0';
-      }
       observer.observe(ref.current);
     }
 
     return () => observer.disconnect();
-  }, [staggerChildren]);
+  }, []);
 
+  // Use the group class and our custom is-visible state for declarative CSS animations
+  // Children with `reveal-item` will react to `.is-visible` 
   return (
-    <div ref={ref} className={className}>
+    <div 
+      ref={ref} 
+      className={`${className} ${staggerChildren ? 'stagger-reveal-group' : 'reveal-group'} ${isVisible ? 'is-visible' : ''}`}
+    >
       {children}
     </div>
   );

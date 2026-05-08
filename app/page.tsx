@@ -37,7 +37,7 @@ export default async function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       {/* Navbar - Using sticky header with backdrop blur */}
-      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <TeleZetaLogo variant="dark" size="md" priority={true} />
@@ -166,7 +166,7 @@ export default async function LandingPage() {
 
             <ScrollReveal staggerChildren className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {doctors.map((doctor, i) => (
-                <div key={doctor.id} className="reveal-item card p-6">
+                <div key={doctor.id} className="reveal-item card p-6 group hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(74,159,212,0.15)] hover:border-blue-200 transition-all duration-400">
                   <div className="flex items-start gap-4 mb-4">
                     <Avatar
                       name={doctor.profiles?.full_name ?? 'Dokter'}
@@ -200,9 +200,10 @@ export default async function LandingPage() {
                     </div>
                     <Link
                       href="/register"
-                      className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 rounded-lg font-medium text-sm transition-colors"
+                      className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium text-sm transition-all duration-300 group-hover:bg-blue-600 group-hover:text-white group-hover:px-6 flex items-center gap-1 group/btn"
                     >
-                      Buat Janji
+                      <span>Buat Janji</span>
+                      <ArrowRight className="w-4 h-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                     </Link>
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import type { Viewport } from "next";
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { createClient } from '@/lib/supabase/server';
+import ScrollProgress from '@/components/common/ScrollProgress';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <ScrollProgress />
         <AuthProvider initialUser={user} initialProfile={profile} initialRole={profile?.role as any}>
           {children}
         </AuthProvider>

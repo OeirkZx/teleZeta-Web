@@ -60,6 +60,30 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const items = role ? NAV_ITEMS[role] : [];
 
+  // Swipe-to-close logic
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStartHandler = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMoveHandler = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEndHandler = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    
+    if (isLeftSwipe && onMobileClose) {
+      onMobileClose();
+    }
+  };
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     await onSignOut();
@@ -165,7 +189,12 @@ export default function Sidebar({ profile, role, onSignOut, mobileOpen, onMobile
 
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-[100] flex">
+        <div 
+          className="md:hidden fixed inset-0 z-[100] flex"
+          onTouchStart={onTouchStartHandler}
+          onTouchMove={onTouchMoveHandler}
+          onTouchEnd={onTouchEndHandler}
+        >
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn"
             onClick={onMobileClose}
