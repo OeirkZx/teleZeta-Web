@@ -1,5 +1,6 @@
 // [TeleZeta] Consultation Room (Video Call / Chat)
-// Menggunakan Jitsi Meet (meet.jit.si) untuk video call gratis & unlimited
+// Menggunakan Jitsi as a Service (8x8.vc JaaS) — gratis 10.000 menit/bulan
+// JaaS tidak punya batasan "waiting for moderator" seperti meet.jit.si publik
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -16,13 +17,14 @@ import { formatTimeWIB } from '@/lib/utils/formatters';
 import { logError } from '@/lib/utils/logger';
 import { PhoneOff, MessageSquare, Send, AlertCircle } from 'lucide-react';
 
-// Jitsi Meet SDK harus di-load client-side saja (butuh `window` object)
-const JitsiMeeting = dynamic(
-  () => import('@jitsi/react-sdk').then((mod) => mod.JitsiMeeting),
+// JaaS SDK harus di-load client-side saja (butuh `window` object)
+const JaaSMeeting = dynamic(
+  () => import('@jitsi/react-sdk').then((mod) => mod.JaaSMeeting),
   { ssr: false }
 );
 
-const JITSI_DOMAIN = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si';
+const JAAS_APP_ID = process.env.NEXT_PUBLIC_JAAS_APP_ID ?? '';
+
 
 // ────────────────────────────────────────────────────────────
 // Helpers
@@ -278,10 +280,10 @@ export default function ConsultationRoom({
             className="flex-1 bg-gray-900 relative"
             style={{ minHeight: '50vh' }}
           >
-            {/* Wrapper absolute agar Jitsi iframe mengisi penuh area ini */}
+            {/* Wrapper absolute agar JaaS iframe mengisi penuh area ini */}
             <div style={{ position: 'absolute', inset: 0 }}>
-              <JitsiMeeting
-                domain={JITSI_DOMAIN}
+              <JaaSMeeting
+                appId={JAAS_APP_ID}
                 roomName={jitsiRoomName}
                 userInfo={{
                   displayName,
@@ -310,12 +312,10 @@ export default function ConsultationRoom({
                 }}
                 getIFrameRef={(iframeRef) => {
                   if (!iframeRef) return;
-                  // Set ukuran iframe itu sendiri
                   iframeRef.style.width = '100%';
                   iframeRef.style.height = '100%';
                   iframeRef.style.border = 'none';
-                  // Set juga div wrapper yang dibuat SDK Jitsi (parent langsung)
-                  // Tanpa ini iframe tidak bisa mengembang karena parent height = 0
+                  // Pastikan wrapper div dari SDK juga punya tinggi penuh
                   const wrapper = iframeRef.parentElement;
                   if (wrapper) {
                     wrapper.style.width = '100%';
@@ -326,13 +326,13 @@ export default function ConsultationRoom({
                   jitsiApiRef.current = api;
                 }}
                 onReadyToClose={() => {
-                  // User klik hangup dari UI Jitsi → end consultation
                   handleEndConsultation();
                 }}
               />
             </div>
           </div>
         )}
+
 
         {/* ── Chat Area ─────────────────────────────────────── */}
         <div
