@@ -60,8 +60,7 @@ export interface Appointment {
   consultation_type: ConsultationType;
   status: AppointmentStatus;
   chief_complaint?: string;
-  daily_room_name?: string;
-  daily_room_url?: string;
+  jitsi_room_name?: string; // override opsional; default: telezeta-{id}
   consultation_fee: number;
   notes?: string | null;
   created_at: string;
@@ -327,8 +326,7 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
     consultation_type: 'video',
     status: 'confirmed',
     chief_complaint: 'Demam dan batuk selama 3 hari',
-    daily_room_name: 'telezeta-apt-1',
-    daily_room_url: 'https://telezeta.daily.co/telezeta-apt-1',
+    jitsi_room_name: 'telezeta-apt-1',
     consultation_fee: 75000,
     notes: null,
     created_at: new Date().toISOString(),

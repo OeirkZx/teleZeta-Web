@@ -4,7 +4,8 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import type { Message } from '@/lib/types';import { log, logError } from '@/lib/utils/logger';
+import type { Message } from '@/lib/types';
+import { log, logError } from '@/lib/utils/logger';
 
 
 export function useRealtimeChat(appointmentId: string | null) {
@@ -28,7 +29,7 @@ export function useRealtimeChat(appointmentId: string | null) {
 
         // Populate sender cache from initial load
         if (data) {
-          data.forEach((m: any) => {
+          data.forEach((m: Message) => {
             if (m.sender && m.sender_id) {
               senderCache.current.set(m.sender_id, m.sender);
             }
@@ -38,7 +39,7 @@ export function useRealtimeChat(appointmentId: string | null) {
         if (error) {
           log('[TeleZeta] Error fetching messages:', error.message);
         } else {
-          setMessages((data as any[]) || []);
+          setMessages((data as Message[]) || []);
         }
       } catch (err) {
         log('[TeleZeta] Messages fetch failed:', err);
@@ -64,9 +65,9 @@ export function useRealtimeChat(appointmentId: string | null) {
           table: 'messages',
           filter: `appointment_id=eq.${appointmentId}`,
         },
-        async (payload: any) => {
+        async (payload: { new: Message }) => {
           log('[TeleZeta] New message received:', payload);
-          const newMessage = payload.new as Message;
+          const newMessage = payload.new;
 
           // Use cached sender profile to avoid N+1 query
           let sender = senderCache.current.get(newMessage.sender_id) || null;
