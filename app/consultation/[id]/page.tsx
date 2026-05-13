@@ -274,50 +274,63 @@ export default function ConsultationRoom({
 
         {/* Video Call Area — hanya ditampilkan untuk tipe video */}
         {appointment.consultation_type === 'video' && (
-          <div className="flex-1 bg-gray-900 relative" style={{ minHeight: '50vh' }}>
-            <JitsiMeeting
-              domain={JITSI_DOMAIN}
-              roomName={jitsiRoomName}
-              userInfo={{
-                displayName,
-                email: user?.email ?? '',
-              }}
-              configOverwrite={{
-                startWithAudioMuted: false,
-                startWithVideoMuted: false,
-                prejoinPageEnabled: false,
-                disableDeepLinking: true,
-                disableThirdPartyRequests: true,
-                toolbarButtons: [
-                  'microphone',
-                  'camera',
-                  'hangup',
-                  'chat',
-                  'tileview',
-                  'fullscreen',
-                ],
-              }}
-              interfaceConfigOverwrite={{
-                MOBILE_APP_PROMO: false,
-                SHOW_JITSI_WATERMARK: false,
-                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-                HIDE_INVITE_MORE_HEADER: true,
-              }}
-              getIFrameRef={(iframeRef) => {
-                if (iframeRef) {
+          <div
+            className="flex-1 bg-gray-900 relative"
+            style={{ minHeight: '50vh' }}
+          >
+            {/* Wrapper absolute agar Jitsi iframe mengisi penuh area ini */}
+            <div style={{ position: 'absolute', inset: 0 }}>
+              <JitsiMeeting
+                domain={JITSI_DOMAIN}
+                roomName={jitsiRoomName}
+                userInfo={{
+                  displayName,
+                  email: user?.email ?? '',
+                }}
+                configOverwrite={{
+                  startWithAudioMuted: false,
+                  startWithVideoMuted: false,
+                  prejoinPageEnabled: false,
+                  disableDeepLinking: true,
+                  disableThirdPartyRequests: true,
+                  toolbarButtons: [
+                    'microphone',
+                    'camera',
+                    'hangup',
+                    'chat',
+                    'tileview',
+                    'fullscreen',
+                  ],
+                }}
+                interfaceConfigOverwrite={{
+                  MOBILE_APP_PROMO: false,
+                  SHOW_JITSI_WATERMARK: false,
+                  DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+                  HIDE_INVITE_MORE_HEADER: true,
+                }}
+                getIFrameRef={(iframeRef) => {
+                  if (!iframeRef) return;
+                  // Set ukuran iframe itu sendiri
                   iframeRef.style.width = '100%';
                   iframeRef.style.height = '100%';
                   iframeRef.style.border = 'none';
-                }
-              }}
-              onApiReady={(api) => {
-                jitsiApiRef.current = api;
-              }}
-              onReadyToClose={() => {
-                // User klik hangup dari UI Jitsi → end consultation
-                handleEndConsultation();
-              }}
-            />
+                  // Set juga div wrapper yang dibuat SDK Jitsi (parent langsung)
+                  // Tanpa ini iframe tidak bisa mengembang karena parent height = 0
+                  const wrapper = iframeRef.parentElement;
+                  if (wrapper) {
+                    wrapper.style.width = '100%';
+                    wrapper.style.height = '100%';
+                  }
+                }}
+                onApiReady={(api) => {
+                  jitsiApiRef.current = api;
+                }}
+                onReadyToClose={() => {
+                  // User klik hangup dari UI Jitsi → end consultation
+                  handleEndConsultation();
+                }}
+              />
+            </div>
           </div>
         )}
 
